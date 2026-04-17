@@ -19,7 +19,7 @@ MAIN_VERSION=$(node -p "require('./package.json').version")
 cat > package/package.json << EOF
 {
   "name": "@epoch-ai/deliver-cli",
-  "version": "1.0.0",
+  "version": "$MAIN_VERSION",
   "description": "Streamlined MCP server for managing spec workflow (requirements, design, implementation)",
   "type": "module",
   "main": "dist/index.js",

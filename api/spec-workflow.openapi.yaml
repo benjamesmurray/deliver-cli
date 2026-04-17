@@ -280,9 +280,8 @@ components:
             1. Read the requirements-guide below
             2. First read ${path}/requirements.md, then start writing the document
             3. After completing the document, use spec sc_status to check the document status
-            4. When check passes, the model must check if there are any ambiguities or uncertainties to be addressed before proceeding. The model should address these itself unless there is a type of uncertainty which needs guidance from the user.
-            5. Once all ambiguities are resolved, the model must ask the user "Do the requirements look good?", and must not proceed to the design document until getting explicit approval (e.g., "yes", "approved", "looks good", etc.)
-            6. When the user approves, the model must use the spec sc_plan tool to enter the design phase
+            4. Once the requirements are complete, ask the user "Do the requirements look good?"
+            5. When the user approves, the model must use the spec sc_plan tool to enter the design phase
             
             Special case - Skip requirements phase:
             - Only consider skipping when user explicitly requests (e.g., "skip requirements document", "go directly to design")
@@ -338,9 +337,8 @@ components:
             1. Read the requirements-guide below
             2. First read ${path}/requirements.md, then start writing the document
             3. After completing the document, use spec sc_status to check the document status
-            4. When check passes, the model must check if there are any ambiguities or uncertainties to be addressed before proceeding. The model should address these itself unless there is a type of uncertainty which needs guidance from the user.
-            5. Once all ambiguities are resolved, the model must ask the user "Do the requirements look good?", and must not proceed to the design document until getting explicit approval (e.g., "yes", "approved", "looks good", etc.)
-            6. When the user approves, the model must use the spec sc_plan tool to enter the design phase
+            4. Once the requirements are complete, ask the user "Do the requirements look good?"
+            5. When the user approves, the model must use the spec sc_plan tool to enter the design phase
             
             Special case - Skip requirements phase:
             - Only consider skipping when user explicitly requests (e.g., "skip requirements document", "go directly to design")
@@ -392,12 +390,11 @@ components:
             🔄 Current status: Writing design document (current) → Next step: use check to verify format
             
             Model please continue with the following actions:
-            1. Read the design-guide below
-            2. First read ${path}/design.md, then start writing the document
+            1. Read the document-guide below
+            2. First read the file, then start writing
             3. After completing the document, use spec sc_status to check the document status
-            4. When check passes, the model must check if there are any ambiguities or uncertainties to be addressed before proceeding. The model should address these itself unless there is a type of uncertainty which needs guidance from the user.
-            5. Once all ambiguities are resolved, the model must ask the user "Does the design look good?", and must not proceed to task writing until getting explicit approval (e.g., "yes", "approved", "looks good", etc.)
-            6. When the user approves, the model must use the spec sc_plan tool to enter the tasks phase
+            4. Once complete, ask the user for approval
+            5. When the user approves, the model must use the spec sc_plan tool to progress
             
             Special case - Skip design phase:
             - Only consider skipping when user explicitly requests (e.g., "skip design document", "go directly to tasks")
@@ -635,12 +632,11 @@ components:
             🔄 Current status: Writing design document (current) → Next step: use check to verify format
             
             Model please continue with the following actions:
-            1. Read the design-guide below
-            2. First read ${path}/design.md, then start writing the document
+            1. Read the document-guide below
+            2. First read the file, then start writing
             3. After completing the document, use spec sc_status to check the document status
-            4. When check passes, the model must check if there are any ambiguities or uncertainties to be addressed before proceeding. The model should address these itself unless there is a type of uncertainty which needs guidance from the user.
-            5. Once all ambiguities are resolved, the model must ask the user "Does the design look good?", and must not proceed to task writing until getting explicit approval (e.g., "yes", "approved", "looks good", etc.)
-            6. When the user approves, the model must use the spec sc_plan tool to enter the tasks phase
+            4. Once complete, ask the user for approval
+            5. When the user approves, the model must use the spec sc_plan tool to progress
             
             Special case - Skip design phase:
             - Only consider skipping when user explicitly requests (e.g., "skip design document", "go directly to tasks")

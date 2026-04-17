@@ -1,23 +1,23 @@
-# Spec CLI (MCP)
+# Deliver CLI
 
-[![npm version](https://img.shields.io/npm/v/mcp-spec-cli.svg)](https://www.npmjs.com/package/mcp-spec-cli)
+[![npm version](https://img.shields.io/npm/v/@epoch-ai/deliver-cli.svg)](https://www.npmjs.com/package/@epoch-ai/deliver-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.com)
 
 [English](README.md) | [简体中文](README-zh.md)
 
-**Spec CLI** is a streamlined, state-aware Model Context Protocol (MCP) server that transforms your AI agent into a spec-driven product engineer. It provides a robust, zero-shot workflow that guides AI to systematically move from **Requirements → Design → Tasks** with minimal token usage and maximum autonomy.
+**Deliver CLI** is a streamlined, state-aware Model Context Protocol (MCP) server that transforms your AI agent into a spec-driven product engineer. It provides a robust, zero-shot workflow that guides AI to systematically move from **Requirements → Design → Tasks** with minimal token usage and maximum autonomy.
 
-## Why Spec CLI?
+## Why Deliver CLI?
 
-The traditional approach to AI coding often leads to scope creep and forgotten requirements. `mcp-spec-cli` (often aliased as `spec`) fixes this by providing:
+The traditional approach to AI coding often leads to scope creep and forgotten requirements. `deliver-cli` (often aliased as `spec`) fixes this by providing:
 
 *   **State-Aware Autopilot:** The tool knows exactly what stage the project is in. The AI doesn't have to track whether it's doing "Requirements" or "Design"—it just calls `spec sc_plan` and the tool handles the transition automatically.
 *   **Streamlined Workflow:** Moves directly from Requirements (PRD) to Technical Design and then Implementation Tasks. No mandatory ambiguity resolution loops or testing phases—just pure execution.
 *   **One-Shot vs. Step-Through Modes:** Users can toggle between **Step-Through** (the default "Draft -> Approve -> Confirm" cycle) and **One-Shot** mode. In One-Shot mode, the AI progresses through all phases—including archiving the project—without stopping for human approval.
 *   **Lifecycle Directory Management:** Automatically organizes work into `projects/active/` and `projects/completed/`. Once a workflow is finalized (or manually archived), the tool moves the entire feature folder to the completed directory.
 *   **Persistent Task-Epoch Memory:** A "short-term memory" system (`.epoch-context.md`) that tracks active focus, pending intentions, and hypotheses via `spec sc_epoch`. This ensures that if an AI session is interrupted or closed, the next session resumes with perfect context.
-*   **The "GPS Breadcrumb" System:** At the end of every tool call, `mcp-spec-cli` outputs an explicit "Next Step" directive. This turns the tool into an autonomous GPS, heavily reducing the need for lengthy system prompts.
+*   **The "GPS Breadcrumb" System:** At the end of every tool call, `deliver-cli` outputs an explicit "Next Step" directive. This turns the tool into an autonomous GPS, heavily reducing the need for lengthy system prompts.
 *   **Explicit Approval Gates:** To prevent premature implementation, the workflow includes an explicit `spec sc_approve` step. After the AI completes a draft (Requirements, Design, or Tasks), it enters a **Reviewing** state. In Step-Through mode, the user must approve the document before the AI can proceed.
 *   **Lexer-Guided Reliability:** Uses a robust Markdown lexer (powered by `marked`) instead of fragile Regular Expressions to parse and surgically update documents. This ensures task checkboxes are updated accurately without corrupting other formatting.
 
@@ -121,13 +121,13 @@ While primarily used via MCP, Spec CLI also provides a powerful standalone inter
 #### Option 1: Quick Start (npx)
 Run it without installing globally:
 ```bash
-npx -y mcp-spec-cli@latest
+npx -y @epoch-ai/deliver-cli
 ```
 
 #### Option 2: Global Installation
 For frequent use as a standalone CLI:
 ```bash
-npm install -g mcp-spec-cli
+npm install -g @epoch-ai/deliver-cli
 ```
 
 #### Option 3: MCP Client Configuration
@@ -138,22 +138,22 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ```json
 {
   "mcpServers": {
-    "mcp-spec-cli": {
+    "deliver-cli": {
       "command": "npx",
-      "args": ["-y", "mcp-spec-cli@latest"]
+      "args": ["-y", "@epoch-ai/deliver-cli"]
     }
   }
 }
 ```
 
 **Gemini CLI**
-Configure `mcp-spec-cli` globally in `~/.gemini/settings.json` or locally in `.gemini/settings.json`:
+Configure `deliver-cli` globally in `~/.gemini/settings.json` or locally in `.gemini/settings.json`:
 ```json
 {
   "mcpServers": {
-    "mcp-spec-cli": {
+    "deliver-cli": {
       "command": "npx",
-      "args": ["-y", "mcp-spec-cli@latest"]
+      "args": ["-y", "@epoch-ai/deliver-cli"]
     }
   }
 }
@@ -161,7 +161,7 @@ Configure `mcp-spec-cli` globally in `~/.gemini/settings.json` or locally in `.g
 
 **Claude Code**
 ```bash
-claude mcp add mcp-spec-cli -s user -- npx -y mcp-spec-cli@latest
+claude mcp add deliver-cli -s user -- npx -y @epoch-ai/deliver-cli
 ```
 
 ## Development
@@ -170,8 +170,8 @@ claude mcp add mcp-spec-cli -s user -- npx -y mcp-spec-cli@latest
 
 1.  **Clone the Repo**:
     ```bash
-    git clone https://github.com/benjamesmurray/mcp-spec-cli.git
-    cd mcp-spec-cli
+    git clone https://github.com/benjamesmurray/deliver-cli.git
+    cd deliver-cli
     ```
 2.  **Install Dependencies**:
     ```bash
