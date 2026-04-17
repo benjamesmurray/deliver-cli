@@ -80,33 +80,6 @@ describe('Workflow Improvements Integration', () => {
     });
   });
 
-  describe('sc_analyze tool', () => {
-    it('should provide stage-specific critique prompts', async () => {
-      const featureName = 'analyze-prompts-test';
-      await tools['sc_init'].callback({ name: featureName }, {});
-      const featurePath = join(tempDir, 'projects', 'active', featureName);
-      const reqFile = WorkflowStateRepository.getStageFileName('requirements');
-      const desFile = WorkflowStateRepository.getStageFileName('design');
-      
-      // 1. Requirements stage
-      writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
-      const resReq = await tools['sc_analyze'].callback({ feature: featureName }, {});
-      expect(resReq.content[0].text).toContain('### [Self-Critique] Requirements Analysis');
-      expect(resReq.content[0].text).toContain('Ambiguities');
-
-      // 2. Advance to Design
-      await tools['sc_guidance'].callback({ feature: featureName }, {});
-      await tools['sc_approve'].callback({ feature: featureName }, {});
-      await tools['sc_plan'].callback({ feature: featureName }, {});
-      
-      // 3. Design stage
-      writeFileSync(join(featurePath, desFile), '# Design\nDone.', 'utf-8');
-      const resDes = await tools['sc_analyze'].callback({ feature: featureName }, {});
-      expect(resDes.content[0].text).toContain('### [Self-Critique] Design Analysis');
-      expect(resDes.content[0].text).toContain('Technical Risks');
-    });
-  });
-
   describe('Approval Cooling-off Period', () => {
     it('should strictly enforce a 2-second delay between sc_feedback and sc_approve', async () => {
       const featureName = 'cooling-off-test';
@@ -115,9 +88,6 @@ describe('Workflow Improvements Integration', () => {
       const reqFile = WorkflowStateRepository.getStageFileName('requirements');
       writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
 
-      await tools['sc_guidance'].callback({ feature: featureName }, {});
-      await tools['sc_analyze'].callback({ feature: featureName }, {});
-      
       // Provide feedback
       await tools['sc_feedback'].callback({ feature: featureName, feedback: 'Acknowledged.' }, {});
       
@@ -146,19 +116,11 @@ describe('Workflow Improvements Integration', () => {
 
         writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
 
-        // Attempt sc_plan without sc_guidance/sc_analyze - should fail due to enforcement
-        const planResFail = await tools['sc_plan'].callback({ feature: featureName }, {});
-        expect(planResFail.content[0].text).toContain('You must run `spec sc_guidance`');
-
-        // Run guidance and analyze
-        await tools['sc_guidance'].callback({ feature: featureName }, {});
-        await tools['sc_analyze'].callback({ feature: featureName }, {});
-
         // Now sc_plan should succeed IMMEDIATELY without sc_approve
         const planResSuccess = await tools['sc_plan'].callback({ feature: featureName }, {});
         expect(planResSuccess.content[0].text).toContain('Requirements complete. Scaffolding Design.md.');
         expect(existsSync(join(featurePath, desFile))).toBe(true);
       });
       });
-      });
+});
 });

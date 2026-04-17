@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { tmpdir } from 'os';
 import { SpecManager } from '../../src/features/shared/SpecManager.js';
 import { WorkflowStateRepository } from '../../src/features/shared/workflowStateRepository.js';
@@ -133,7 +133,7 @@ describe('SpecManager', () => {
       expect(summary).toContain('Requirements: Reviewing');
       expect(summary).toContain('Design: Missing');
       expect(summary).toContain('🛑 STRICT MANDATE: You are in the Planning Phase');
-      expect(summary).toContain('🔍 [REVIEW] Requirements drafted. **CRITICAL: You must now analyze for ambiguities before approval.** Run `spec sc_analyze` for analysis steps, then `spec sc_approve` when ready.');
+      expect(summary).toContain('🔍 [REVIEW] Requirements drafted. Review and run `spec sc_approve` when ready.');
     });
 
     it('should return one-shot specific instructions when mode is one-shot', () => {
@@ -148,7 +148,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('Requirements: Reviewing');
       expect(summary).toContain('🛑 STRICT MANDATE: You are in the Planning Phase');
-      expect(summary).toContain('🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Run `spec sc_analyze` followed by `spec sc_guidance`. Once resolved, run `spec sc_plan` to scaffold the design phase.');
+      expect(summary).toContain('🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the design phase.');
     });
     
     it('should handle full workflow Reviewing state', () => {
@@ -166,7 +166,7 @@ describe('SpecManager', () => {
       expect(summary).toContain('Tasks: Reviewing');
     });
 
-    it('should return Action Required for testing phase pending edits', () => {
+    it('should return Action Required if a middle stage is pending edits', () => {
       const featureName = 'test-feature';
       const featurePath = join(tempDir, 'projects', 'active', featureName);
       mkdirSync(featurePath, { recursive: true });
@@ -174,21 +174,18 @@ describe('SpecManager', () => {
       
       writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('requirements')), 'Req', 'utf-8');
       writeFileSync(join(featurePath, '.spec-requirements-approved'), 'ok', 'utf-8');
-      writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('design')), 'Des', 'utf-8');
-      writeFileSync(join(featurePath, '.spec-design-approved'), 'ok', 'utf-8');
-      writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('tasks')), '- [x] 1.1 Done', 'utf-8');
-      writeFileSync(join(featurePath, '.spec-tasks-approved'), 'ok', 'utf-8');
-      writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('testing')), '<template-testing>placeholder</template-testing>', 'utf-8');
+      writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('design')), '<template-design>placeholder</template-design>', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Testing: Pending Edits');
-      expect(summary).toContain('⚠️ [ACTION REQUIRED] Complete drafting testing and remove all `<template-testing>` tags.');
+      expect(summary).toContain('Design: Pending Edits');
+      expect(summary).toContain('⚠️ [ACTION REQUIRED] Complete drafting design and remove all `<template-design>` tags.');
     });
 
     it('should return approved state when approval marker exists', () => {
       const featureName = 'test-feature';
       const featurePath = join(tempDir, 'projects', 'active', featureName);
-      mkdirSync(featurePath, { recursive: true });
+      mkdirSync(dirname(featurePath), { recursive: true });
+      mkdirSync(featurePath);
       
       writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('requirements')), 'Req', 'utf-8');
       writeFileSync(join(featurePath, '.spec-requirements-approved'), '2026-04-10', 'utf-8');

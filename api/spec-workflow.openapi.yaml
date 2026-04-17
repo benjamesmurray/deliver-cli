@@ -54,7 +54,7 @@ components:
       properties:
         type:
           type: string
-          enum: [sc_init, sc_refresh, init, check, skip, confirm, complete_task, update_epoch, approve, guidance, feedback]
+          enum: [sc_init, sc_refresh, init, check, skip, confirm, complete_task, update_epoch, approve, feedback]
           description: |
             Operation type to perform:
 
@@ -65,7 +65,6 @@ components:
             - **skip**: Skip current stage
             - **confirm**: Confirm current stage completion
             - **approve**: Explicitly approve the current drafted phase after review
-            - **guidance**: Get detailed behavioral instructions
             - **complete_task**: Mark task(s) as completed
             - **update_epoch**: Update the continuous task-epoch context
             - **feedback**: Record user answers or feedback (clears open questions)

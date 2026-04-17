@@ -34,36 +34,6 @@ describe('Feedback Enforcement Integration', () => {
     }
   });
 
-  it('should enforce sc_guidance and sc_analyze before sc_approve', async () => {
-    const featureName = 'guidance-test';
-    await tools['sc_init'].callback({ name: featureName }, {});
-    
-    const reqFile = WorkflowStateRepository.getStageFileName('requirements');
-    const featurePath = join(tempDir, 'projects', 'active', featureName);
-    writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
-
-    // Attempt approve without guidance
-    const approveRes = await tools['sc_approve'].callback({ feature: featureName }, {});
-    expect(approveRes.isError).toBe(true);
-    expect(approveRes.content[0].text).toContain('You must run `spec sc_guidance` to review the requirements before advancing.');
-
-    // Run guidance
-    await tools['sc_guidance'].callback({ feature: featureName }, {});
-    
-    // Attempt approve without analyze
-    const approveResA = await tools['sc_approve'].callback({ feature: featureName }, {});
-    expect(approveResA.isError).toBe(true);
-    expect(approveResA.content[0].text).toContain('You must run `spec sc_analyze` to perform a self-critique for ambiguities');
-
-    // Run analyze
-    const analyzeRes = await tools['sc_analyze'].callback({ feature: featureName }, {});
-    expect(analyzeRes.content[0].text).toContain('### [Self-Critique] Requirements Analysis');
-
-    // Now approve should work
-    const approveRes2 = await tools['sc_approve'].callback({ feature: featureName }, {});
-    expect(approveRes2.content[0].text).toContain('Requirements Document" has been approved');
-  });
-
   it('should enforce no open questions before sc_approve', async () => {
     const featureName = 'questions-test';
     await tools['sc_init'].callback({ name: featureName }, {});
@@ -71,10 +41,6 @@ describe('Feedback Enforcement Integration', () => {
     const reqFile = WorkflowStateRepository.getStageFileName('requirements');
     const featurePath = join(tempDir, 'projects', 'active', featureName);
     writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
-
-    // Run guidance and analyze
-    await tools['sc_guidance'].callback({ feature: featureName }, {});
-    await tools['sc_analyze'].callback({ feature: featureName }, {});
 
     // Add open question
     await tools['sc_epoch'].callback({ feature: featureName, openQuestions: 'What color should the logo be?' }, {});
@@ -92,17 +58,13 @@ describe('Feedback Enforcement Integration', () => {
     expect(approveRes2.content[0].text).toContain('Requirements Document" has been approved');
   });
 
-  it('should enforce sc_guidance, sc_analyze and no open questions in one-shot mode sc_plan', async () => {
+  it('should enforce no open questions in one-shot mode sc_plan', async () => {
     const featureName = 'oneshot-enforcement';
     await tools['sc_init'].callback({ name: featureName, mode: 'one-shot' }, {});
     
     const reqFile = WorkflowStateRepository.getStageFileName('requirements');
     const featurePath = join(tempDir, 'projects', 'active', featureName);
     writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
-
-    // Run guidance and analyze
-    await tools['sc_guidance'].callback({ feature: featureName }, {});
-    await tools['sc_analyze'].callback({ feature: featureName }, {});
 
     // Add open question
     await tools['sc_epoch'].callback({ feature: featureName, openQuestions: 'How to handle errors?' }, {});
@@ -127,10 +89,6 @@ describe('Feedback Enforcement Integration', () => {
     const featurePath = join(tempDir, 'projects', 'active', featureName);
     writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
 
-    // Run guidance and analyze
-    await tools['sc_guidance'].callback({ feature: featureName }, {});
-    await tools['sc_analyze'].callback({ feature: featureName }, {});
-
     // Provide feedback
     const feedbackRes = await tools['sc_feedback'].callback({ feature: featureName, feedback: 'Use blue for the logo.' }, {});
     expect(feedbackRes.content[0].text).toContain('Feedback acknowledged and recorded');
@@ -147,29 +105,4 @@ describe('Feedback Enforcement Integration', () => {
     const approveRes2 = await tools['sc_approve'].callback({ feature: featureName }, {});
     expect(approveRes2.content[0].text).toContain('Requirements Document" has been approved');
   }, 10000);
-
-  it('should enforce sc_analyze before sc_approve', async () => {
-    const featureName = 'analyze-enforcement-test';
-    await tools['sc_init'].callback({ name: featureName }, {});
-    
-    const reqFile = WorkflowStateRepository.getStageFileName('requirements');
-    const featurePath = join(tempDir, 'projects', 'active', featureName);
-    writeFileSync(join(featurePath, reqFile), '# Requirements\nDone.', 'utf-8');
-
-    // Run guidance
-    await tools['sc_guidance'].callback({ feature: featureName }, {});
-
-    // Attempt approve without analyze
-    const approveRes = await tools['sc_approve'].callback({ feature: featureName }, {});
-    expect(approveRes.isError).toBe(true);
-    expect(approveRes.content[0].text).toContain('You must run `spec sc_analyze` to perform a self-critique for ambiguities');
-
-    // Run analyze
-    const analyzeRes = await tools['sc_analyze'].callback({ feature: featureName }, {});
-    expect(analyzeRes.content[0].text).toContain('### [Self-Critique] Requirements Analysis');
-
-    // Now approve should work
-    const approveRes2 = await tools['sc_approve'].callback({ feature: featureName }, {});
-    expect(approveRes2.content[0].text).toContain('Requirements Document" has been approved');
-  });
 });

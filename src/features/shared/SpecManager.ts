@@ -197,7 +197,11 @@ export class SpecManager {
          nextSteps = '⚠️ [ACTION REQUIRED] Complete drafting requirements and remove all `<template-requirements>` tags.';
       } else if (!state.requirements.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
-         nextSteps = '🔍 [REVIEW] Requirements drafted. Review and run `spec sc_approve` when ready.';
+         if (mode === 'one-shot') {
+            nextSteps = '🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the design phase.';
+         } else {
+            nextSteps = '🔍 [REVIEW] Requirements drafted. Review and run `spec sc_approve` when ready.';
+         }
       } else if (!state.design.exists) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
          nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the design phase.';
@@ -206,7 +210,11 @@ export class SpecManager {
          nextSteps = '⚠️ [ACTION REQUIRED] Complete drafting design and remove all `<template-design>` tags.';
       } else if (!state.design.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('design');
-         nextSteps = '🔍 [REVIEW] Design drafted. Review and run `spec sc_approve` when ready.';
+         if (mode === 'one-shot') {
+            nextSteps = '🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the tasks phase.';
+         } else {
+            nextSteps = '🔍 [REVIEW] Design drafted. Review and run `spec sc_approve` when ready.';
+         }
       } else if (!state.tasks.exists) {
          phase = WorkflowStateRepository.getStageDisplayName('design');
          nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the tasks phase.';
@@ -215,7 +223,27 @@ export class SpecManager {
          nextSteps = '⚠️ [ACTION REQUIRED] Complete drafting tasks and remove all `<template-tasks>` tags.';
       } else if (!state.tasks.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('tasks');
-         nextSteps = '🔍 [REVIEW] Tasks drafted. Review and run `spec sc_approve` when ready.';
+         if (mode === 'one-shot') {
+            let firstTaskId = '';
+            if (state.tasks.exists) {
+                const tasksPath = join(featurePath, WorkflowStateRepository.getStageFileName('tasks'));
+                const content = readFileSync(tasksPath, 'utf-8');
+                const tasks = TaskParser.parse(content);
+                const findFirst = (ts: any[]): any => {
+                    for (const t of ts) {
+                        if (!t.completed) return t;
+                        const found = findFirst(t.children);
+                        if (found) return found;
+                    }
+                    return null;
+                };
+                const first = findFirst(tasks);
+                if (first) firstTaskId = ` --id ${first.id}`;
+            }
+            nextSteps = `🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run \`spec sc_todo_start${firstTaskId}\` to begin implementation.`;
+         } else {
+            nextSteps = '🔍 [REVIEW] Tasks drafted. Review and run `spec sc_approve` when ready.';
+         }
       } else if (!allTasksComplete) {
          isPlanningPhase = false;
          phase = 'Implementation';
@@ -254,44 +282,9 @@ Next Step: Run \`spec sc_init --name "your-feature"\` to start a new feature.`;
   }
 
   /**
-   * Gets detailed behavioral guidance for the current state.
-   */
-  static getGuidance(baseDir: string, featureName?: string): string {
-    const featurePath = this.resolveFeaturePath(baseDir, featureName);
-    const state = this.getWorkflowState(featurePath);
-    const mode = this.getMode(featurePath);
-
-    let phase = '';
-    let guidanceText = '';
-
-    if (state.requirements.exists && state.requirements.edited && !state.requirements.approved) {
-        phase = 'requirements';
-        guidanceText = 'Review the requirements for clarity and completeness. Ask the user for clarification if needed. Once ready, ask for explicit approval and run `spec sc_approve`.';
-    } else if (state.design.exists && state.design.edited && !state.design.approved) {
-        phase = 'design';
-        guidanceText = 'Review the technical design for feasibility and alignment with requirements. Once ready, ask for explicit approval and run `spec sc_approve`.';
-    } else if (state.tasks.exists && state.tasks.edited && !state.tasks.approved) {
-        phase = 'tasks';
-        guidanceText = 'Review the implementation task plan. Ensure task sizes are appropriate and dependencies are logically ordered. Once ready, ask for explicit approval and run `spec sc_approve`.';
-    }
-
-    if (phase) {
-        const markerPath = join(featurePath, `.spec-${phase}-guidance`);
-        writeFileSync(markerPath, new Date().toISOString(), 'utf-8');
-        return guidanceText;
-    }
-
-    return 'No specific behavioral guidance for the current state. Follow the snappy "Next Step" in `spec sc_status`.';
-  }
-  /**
    * Validates that the current phase is ready to be approved or advanced.
    */
   static validateTransition(featurePath: string, phase: string): void {
-    const guidancePath = join(featurePath, `.spec-${phase}-guidance`);
-    if (!existsSync(guidancePath)) {
-        throw new Error(`You must run \`spec sc_guidance\` to review the ${phase} before advancing.`);
-    }
-
     const epochPath = join(featurePath, '.epoch-context.md');
     if (existsSync(epochPath)) {
         const epochContent = readFileSync(epochPath, 'utf-8');

@@ -78,7 +78,6 @@ Spec CLI provides a suite of surgical MCP tools to guide the AI agent through th
 | `spec sc_init` | Initialize a new feature specification in `projects/active/`. | `{"name": "auth-system", "mode": "one-shot"}` |
 | `spec sc_plan` | Progress the workflow state. Automatically archives when finished. | `{"instruction": "Use PostgreSQL"}` |
 | `spec sc_approve` | Explicitly approve the current drafted phase after review. | `{}` |
-| `spec sc_guidance` | Get behavioral instructions for the current state. | `{}` |
 | `spec sc_feedback` | Provide user feedback or answers to questions. | `{"feedback": "The logo should be blue"}` |
 | `spec sc_status` | Get a health check of the active project and snappy next steps. | `{"feature": "auth-system"}` |
 | `spec sc_todo_list` | List all implementation tasks and their status. | `{}` |
@@ -100,7 +99,6 @@ While primarily used via MCP, Spec CLI also provides a powerful standalone inter
 | `spec sc_init --name <name>` | Initialize a new feature specification. |
 | `spec sc_plan` | Progress the workflow state. |
 | `spec sc_approve` | Explicitly approve the current phase. |
-| `spec sc_guidance` | Get behavioral instructions. |
 | `spec sc_feedback --feedback <text>` | Provide user feedback or answers. |
 | `spec sc_todo_list` | List implementation tasks. |
 | `spec sc_epoch --focus <text>` | Update short-term memory context. |

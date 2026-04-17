@@ -56,8 +56,6 @@ describe('Spec CLI Workflow Integration', () => {
     writeFileSync(reqPath, '# Requirements\nWe will use Stripe.', 'utf-8');
 
     // 3.5. Approve requirements
-    await tools['sc_guidance'].callback({}, {});
-    await tools['sc_analyze'].callback({}, {});
     const approveReqRes = await tools['sc_approve'].callback({}, {});
     expect(approveReqRes.content[0].text).toContain('Requirements Document" has been approved');
 
@@ -71,8 +69,6 @@ describe('Spec CLI Workflow Integration', () => {
     writeFileSync(desPath, '# Design\nStripe API design.', 'utf-8');
 
     // 5.5. Approve design
-    await tools['sc_guidance'].callback({}, {});
-    await tools['sc_analyze'].callback({}, {});
     const approveDesRes = await tools['sc_approve'].callback({}, {});
     expect(approveDesRes.content[0].text).toContain('Design Document" has been approved');
 
@@ -86,8 +82,6 @@ describe('Spec CLI Workflow Integration', () => {
     writeFileSync(tasksPath, '# Tasks\n- [ ] 1.1 Setup Stripe webhook\n- [ ] 1.2 Implement checkout', 'utf-8');
 
     // 7.5. Approve tasks
-    await tools['sc_guidance'].callback({}, {});
-    await tools['sc_analyze'].callback({}, {});
     const approveTskRes = await tools['sc_approve'].callback({}, {});
     expect(approveTskRes.content[0].text).toContain('Task List" has been approved');
 

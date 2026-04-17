@@ -40,7 +40,7 @@ function archiveProject(baseDir: string, featureName?: string): string {
     return 'Project is already in the completed directory.';
   }
 
-  if (!existsSync(targetDir)) {
+  if (!exists(targetDir)) {
     mkdirSync(targetDir, { recursive: true });
   }
 
@@ -62,6 +62,10 @@ function archiveProject(baseDir: string, featureName?: string): string {
   // Update .spec_last_used with new relative path
   writeFileSync(join(rootDir, '.spec_last_used'), join('projects', 'completed', featureDirName), 'utf-8');
   return `Successfully archived project to ${join('projects', 'completed', featureDirName)}.`;
+}
+
+function exists(path: string): boolean {
+  return existsSync(path);
 }
 
 async function main() {
@@ -104,16 +108,6 @@ This is required in 'step-through' mode before calling 'spec sc_plan' to move to
 
 Usage:
   spec sc_approve [flags]
-
-Flags:
-  --feature <name>      Target feature name.
-`;
-        } else if (topic === 'guidance') {
-          output = `
-Get detailed behavioral instructions for the current state.
-
-Usage:
-  spec sc_guidance [flags]
 
 Flags:
   --feature <name>      Target feature name.
@@ -178,7 +172,6 @@ Available Commands:
   spec sc_init          Initialize a new feature.
   spec sc_plan          Progress the workflow state.
   spec sc_approve       Approve the current drafted phase.
-  spec sc_guidance      Get detailed behavioral instructions.
   spec sc_todo_list     List implementation tasks.
   spec sc_todo_start    Start a task.
   spec sc_todo_complete Complete a task.
@@ -226,7 +219,6 @@ Available Commands:
   spec sc_init          Initialize a new feature.
   spec sc_plan          Progress the workflow state.
   spec sc_approve       Approve the current drafted phase.
-  spec sc_guidance      Get detailed behavioral instructions.
   spec sc_todo_*        Manage implementation tasks.
   spec sc_epoch         Update short-term memory context.
   spec sc_archive       Manually archive the project.
@@ -263,7 +255,7 @@ Use "spec sc_help [command]" for more information about a command.
         if (!featureName) throw new Error('--name or --feature is required for init');
         
         const featurePath = SpecManager.resolveFeaturePath(baseDir, featureName);
-        if (!existsSync(featurePath)) {
+        if (!exists(featurePath)) {
           mkdirSync(featurePath, { recursive: true });
         }
         
@@ -272,7 +264,7 @@ Use "spec sc_help [command]" for more information about a command.
         }
 
         const reqPath = join(featurePath, WorkflowStateRepository.getStageFileName('requirements'));
-        if (!existsSync(reqPath)) {
+        if (!exists(reqPath)) {
           const content = TemplateRepository.getInterpolatedTemplate('requirements', { 
             featureName, 
             introduction: values.description || 'Initial requirements' 
@@ -304,7 +296,7 @@ Use "spec sc_help [command]" for more information about a command.
         
         // Update epoch context: Clear open questions since feedback was provided
         const epochPath = join(featurePath, '.epoch-context.md');
-        if (existsSync(epochPath)) {
+        if (exists(epochPath)) {
             let epochContent = readFileSync(epochPath, 'utf-8');
             epochContent = epochContent.replace(/## Open Questions \/ Uncertainties[\s\S]*?(?=##|$)/, `## Open Questions / Uncertainties\n*   None (Feedback received: ${feedback.slice(0, 50)}${feedback.length > 50 ? '...' : ''})\n\n`);
             writeFileSync(epochPath, epochContent, 'utf-8');
@@ -315,10 +307,6 @@ Use "spec sc_help [command]" for more information about a command.
         writeFileSync(feedbackMarker, new Date().toISOString(), 'utf-8');
         
         output = `Feedback acknowledged and recorded. Open questions have been cleared.\n\n${SpecManager.getStatusSummary(baseDir, values.feature)}`;
-        console.log(output);
-      }
-      else if (subcommand === 'guidance') {
-        output = SpecManager.getGuidance(baseDir, values.feature);
         console.log(output);
       }
       else if (subcommand === 'plan') {
@@ -340,7 +328,7 @@ Use "spec sc_help [command]" for more information about a command.
             message = `Please finish editing ${WorkflowStateRepository.getStageFileName('requirements')} (remove all <template> tags) before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.requirements.approved && mode !== 'one-shot') {
-            message = `Requirements drafted but not yet approved. Please run \`spec sc_guidance\` for review instructions, then \`spec sc_approve\` before advancing.`;
+            message = `Requirements drafted but not yet approved. Please review and run \`spec sc_approve\` before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.design.exists) {
             if (mode === 'one-shot') {
@@ -365,7 +353,7 @@ Use "spec sc_help [command]" for more information about a command.
             message = `Please finish editing ${WorkflowStateRepository.getStageFileName('design')} (remove all <template> tags) before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.design.approved && mode !== 'one-shot') {
-            message = `Design drafted but not yet approved. Please run \`spec sc_guidance\` for review instructions, then \`spec sc_approve\` before advancing.`;
+            message = `Design drafted but not yet approved. Please review and run \`spec sc_approve\` before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.tasks.exists) {
             if (mode === 'one-shot') {
@@ -390,13 +378,13 @@ Use "spec sc_help [command]" for more information about a command.
             message = `Please finish editing ${WorkflowStateRepository.getStageFileName('tasks')} (remove all <template> tags) before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.tasks.approved && mode !== 'one-shot') {
-            message = `Tasks drafted but not yet approved. Please run \`spec sc_guidance\` for review instructions, then \`spec sc_approve\` before advancing.`;
+            message = `Tasks drafted but not yet approved. Please review and run \`spec sc_approve\` before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else {
             // Check if all tasks are complete
             let allTasksComplete = false;
             const tasksPath = join(featurePath, WorkflowStateRepository.getStageFileName('tasks'));
-            if (existsSync(tasksPath)) {
+            if (exists(tasksPath)) {
                 const tasksContent = readFileSync(tasksPath, 'utf-8');
                 const tasks = TaskParser.parse(tasksContent);
                 const areTasksDone = (ts: any[]): boolean => ts.every(t => t.completed && (t.children.length === 0 || areTasksDone(t.children)));
@@ -446,7 +434,7 @@ Use "spec sc_help [command]" for more information about a command.
       else if (subcommand === 'epoch') {
         const featurePath = SpecManager.resolveFeaturePath(baseDir, values.feature);
         const epochPath = join(featurePath, '.epoch-context.md');
-        let epochContent = existsSync(epochPath) ? readFileSync(epochPath, 'utf-8') : `# Epoch Context\n\n`;
+        let epochContent = exists(epochPath) ? readFileSync(epochPath, 'utf-8') : `# Epoch Context\n\n`;
 
         if (values.focus) {
             epochContent = epochContent.replace(/## Active Focus[\s\S]*?(?=##|$)/, `## Active Focus\n*   ${values.focus}\n\n`);
