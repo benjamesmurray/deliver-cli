@@ -273,7 +273,7 @@ Use "spec sc_help [command]" for more information about a command.
           writeFileSync(join(featurePath, '.epoch-context.md'), `# Epoch Context\n\n**Current Phase:** Requirements\n\n`, 'utf-8');
         }
 
-        output = SpecManager.getStatusSummary(baseDir, featureName);
+        output = "Ensure you move through all phases: sc_init, sc_plan, sc_approve, and sc_todo_*.\n\n" + SpecManager.getStatusSummary(baseDir, featureName);
         console.log(output);
       } 
       else if (subcommand === 'mode') {
