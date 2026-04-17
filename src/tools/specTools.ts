@@ -207,29 +207,9 @@ export function registerSpecTools(server: McpServer): void {
   );
 
   server.registerTool(
-    'sc_analyze',
-    {
-      description: 'Perform a dedicated ambiguity analysis and self-critique of the drafted document. This step is mandatory before seeking user approval.',
-      inputSchema: {
-        feature: z.string().optional().describe('Feature name (optional)')
-      }
-    },
-    async (args) => {
-      try {
-        const cliArgs = ['exec', 'analyze'];
-        if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
-        return { content: [{ type: 'text', text: result }] };
-      } catch (error: any) {
-        return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
-      }
-    }
-  );
-
-  server.registerTool(
     'sc_guidance',
     {
-      description: 'Get detailed behavioral instructions for the current state (e.g., Ambiguity Resolution Loop steps).',
+      description: 'Get detailed behavioral instructions for the current state.',
       inputSchema: {
         feature: z.string().optional().describe('Feature name (optional)')
       }

@@ -7,7 +7,7 @@ export class TemplateRepository {
   /**
    * Gets a document template by stage and interpolates variables.
    */
-  static getInterpolatedTemplate(stage: 'requirements' | 'design' | 'tasks' | 'testing' | 'skipped', variables: Record<string, any>): string {
+  static getInterpolatedTemplate(stage: 'requirements' | 'design' | 'tasks' | 'skipped', variables: Record<string, any>): string {
     openApiLoader.loadSpec();
     const template = openApiLoader.getDocumentTemplate(stage);
     if (!template) {

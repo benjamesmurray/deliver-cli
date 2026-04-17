@@ -111,7 +111,6 @@ Flags:
         } else if (topic === 'guidance') {
           output = `
 Get detailed behavioral instructions for the current state.
-Use this to understand the steps required for the "Ambiguity Resolution Loop".
 
 Usage:
   spec sc_guidance [flags]
@@ -299,10 +298,6 @@ Use "spec sc_help [command]" for more information about a command.
         output = SpecManager.approve(baseDir, values.feature);
         console.log(output);
       }
-      else if (subcommand === 'analyze') {
-        output = SpecManager.analyze(baseDir, values.feature);
-        console.log(output);
-      }
       else if (subcommand === 'feedback') {
         const featurePath = SpecManager.resolveFeaturePath(baseDir, values.feature);
         const feedback = values.instruction || '';
@@ -411,46 +406,7 @@ Use "spec sc_help [command]" for more information about a command.
             if (!allTasksComplete) {
                 message = 'Not all implementation tasks are complete. Proceed with `exec todo` or finish tasks manually.';
                 if (values.instruction) message += `\n> Received instruction: ${values.instruction}`;
-            } else if (!state.testing.exists) {
-                if (mode === 'one-shot') {
-                    try {
-                        SpecManager.validateTransition(featurePath, 'tasks');
-                    } catch (e: any) {
-                        output = `${e.message}\n\n${SpecManager.getStatusSummary(baseDir, values.feature)}`;
-                        console.log(output);
-                        return;
-                    }
-                }
-                let content = TemplateRepository.getInterpolatedTemplate('testing', { 
-                  featureName: featurePath.split('/').pop() || 'feature' 
-                });
-                if (values.instruction) content += `\n\n> **Guidance:** ${values.instruction}`;
-                writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('testing')), content, 'utf-8');
-                writeFileSync(join(featurePath, '.epoch-context.md'), `# Epoch Context\n\n**Current Phase:** Testing & Verification\n\n`, 'utf-8');
-                message = `Implementation complete. Scaffolding ${WorkflowStateRepository.getStageFileName('testing')}. Epoch context reset.`;
-                const guide = openApiLoader.getSharedResourceText('testing-guide');
-                if (guide) message += `\n\n--- Guide ---\n${guide}`;
-            } else if (!state.testing.edited) {
-                const mode = SpecManager.getMode(featurePath);
-                if (mode === 'one-shot') {
-                    message = `Please finish editing ${WorkflowStateRepository.getStageFileName('testing')} (remove all <template> tags) and execute automated tests before advancing.`;
-                } else {
-                    message = `Please finish editing ${WorkflowStateRepository.getStageFileName('testing')} (remove all <template> tags) and wait for user feedback before advancing.`;
-                }
-                if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
-            } else if (!state.testing.approved && mode !== 'one-shot') {
-                message = `Testing plan drafted but not yet approved. Please run \`spec sc_guidance\` for review instructions, then \`spec sc_approve\` before advancing.`;
-                if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
             } else {
-                if (mode === 'one-shot') {
-                    try {
-                        SpecManager.validateTransition(featurePath, 'testing');
-                    } catch (e: any) {
-                        output = `${e.message}\n\n${SpecManager.getStatusSummary(baseDir, values.feature)}`;
-                        console.log(output);
-                        return;
-                    }
-                }
                 message = 'Workflow is completely finished.';
                 const archiveResult = archiveProject(baseDir, values.feature);
                 message += `\n\n${archiveResult}`;

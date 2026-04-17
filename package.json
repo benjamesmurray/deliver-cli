@@ -38,12 +38,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benjamesmurray/mcp-spec-cli.git"
+    "url": "git+https://github.com/benjamesmurray/deliver-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/benjamesmurray/mcp-spec-cli/issues"
+    "url": "https://github.com/benjamesmurray/deliver-cli/issues"
   },
-  "homepage": "https://github.com/benjamesmurray/mcp-spec-cli#readme",
+  "homepage": "https://github.com/benjamesmurray/deliver-cli#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@types/js-yaml": "^4.0.9",

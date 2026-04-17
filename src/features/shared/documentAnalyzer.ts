@@ -12,9 +12,7 @@ export const TEMPLATE_MARKERS = {
   DESIGN_START: '<template-design>',
   DESIGN_END: '</template-design>',
   TASKS_START: '<template-tasks>',
-  TASKS_END: '</template-tasks>',
-  TESTING_START: '<template-testing>',
-  TESTING_END: '</template-testing>'
+  TASKS_END: '</template-tasks>'
 };
 
 /**

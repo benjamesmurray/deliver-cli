@@ -54,7 +54,7 @@ components:
       properties:
         type:
           type: string
-          enum: [sc_init, sc_refresh, init, check, skip, confirm, complete_task, update_epoch, approve, guidance, feedback, analyze]
+          enum: [sc_init, sc_refresh, init, check, skip, confirm, complete_task, update_epoch, approve, guidance, feedback]
           description: |
             Operation type to perform:
 
@@ -69,7 +69,6 @@ components:
             - **complete_task**: Mark task(s) as completed
             - **update_epoch**: Update the continuous task-epoch context
             - **feedback**: Record user answers or feedback (clears open questions)
-            - **analyze**: Perform a dedicated ambiguity analysis and self-critique (MANDATORY before approval)
 
         introduction:
           type: string
@@ -849,12 +848,12 @@ components:
     # Common type definitions
     Stage:
       type: string
-      enum: [requirements, design, tasks, testing, completed]
+      enum: [requirements, design, tasks, completed]
       description: Current stage
     
     Progress:
       type: object
-      required: [overall, requirements, design, tasks, testing]
+      required: [overall, requirements, design, tasks]
       properties:
         overall:
           type: integer
@@ -876,11 +875,6 @@ components:
           minimum: 0
           maximum: 100
           description: Tasks phase progress
-        testing:
-          type: integer
-          minimum: 0
-          maximum: 100
-          description: Testing & Verification phase progress
 
       x-progress-rules:
         - description: Requirements phase accounts for 30%
@@ -1119,16 +1113,12 @@ x-shared-resources:
           - A user story in the format "As a [role], I want [feature], so that [benefit]"
           - A numbered list of acceptance criteria in EARS format (Easy Approach to Requirements Syntax)
       - The model SHOULD consider edge cases, user experience, technical constraints, and success criteria in the initial requirements
-      - After updating the requirement document, the model MUST enter the Ambiguity Resolution Loop:
-        - **Dedicated Analysis Action**: You MUST call the `sc_analyze` tool. This will provide you with a specific self-critique prompt.
-        - Perform a thorough self-review of the requirements for ambiguities, edge cases, or missing details based on the `sc_analyze` prompt.
-        - Use the sc_epoch tool to record open questions.
-        - **Mode-Specific Resolution:**
-          - **In STEP-THROUGH mode:** Ask the user targeted questions to resolve ambiguities. When using a prompter tool (like ask_user), you MUST ALWAYS include an 'Other' or open-ended text option. **When the user provides answers, use the spec sc_feedback tool to record them.** This will clear the open questions. DO NOT mistake information or answers for final approval. DO NOT ask for final approval (e.g., "Do the requirements look good?") yet. If answers raise new questions, continue this loop.
-          - **In ONE-SHOT mode:** Resolve all identified issues autonomously using your best judgment. Ensure all open questions recorded in sc_epoch are answered and closed. You DO NOT need to ask the user for approval.
-        - Only when you have zero open questions should you proceed.
+      - After updating the requirement document:
+        - Review the requirements for clarity and completeness.
+        - Ask the user for clarification if needed.
+        - Once ready, ask for explicit approval.
       - **Mode-Specific Progression:**
-        - **In STEP-THROUGH mode:** Only once all ambiguities are resolved AND you have recorded the feedback using sc_feedback, ask for final, explicit approval. **You must not call spec sc_approve in the same turn as sc_feedback. You MUST have called sc_analyze for the current document.**
+        - **In STEP-THROUGH mode:** Only once all ambiguities are resolved, ask for final, explicit approval.
         - **In ONE-SHOT mode:** Once all ambiguities are resolved autonomously, IMMEDIATELY run `spec sc_plan` to scaffold the design phase.
       - The model MUST make modifications to the requirements document if the user requests changes or does not explicitly approve
       - The model MUST NOT call sc_plan to transition to the design phase until receiving clear approval (such as "yes", "approved", "looks good", etc.)
@@ -1171,16 +1161,11 @@ x-shared-resources:
       - The model MUST ensure the design addresses all feature requirements identified during the clarification process
       - The model SHOULD highlight design decisions and their rationales
       - The model MAY ask the user for input on specific technical decisions during the design process
-      - After updating the design document, the model MUST enter the Ambiguity Resolution Loop:
-        - **Dedicated Analysis Action**: You MUST call the `sc_analyze` tool. This will provide you with a specific technical self-critique prompt.
-        - Perform a thorough self-review of the design for technical ambiguities or missing details based on the `sc_analyze` prompt.
-        - Use the sc_epoch tool to record open questions.
-        - **Mode-Specific Resolution:**
-          - **In STEP-THROUGH mode:** Ask the user targeted questions to resolve ambiguities. When using a prompter tool (like ask_user), you MUST ALWAYS include an 'Other' or open-ended text option. **When the user provides answers, use the spec sc_feedback tool to record them.** This will clear the open questions. DO NOT mistake information or answers for final approval. DO NOT ask for final approval (e.g., "Does the design look good?") yet. If answers raise new questions, continue this loop.
-          - **In ONE-SHOT mode:** Resolve all identified issues autonomously using your best judgment. Ensure all open questions recorded in sc_epoch are answered and closed. You DO NOT need to ask the user for approval.
-        - Only when you have zero open questions should you proceed.
+      - After updating the design document:
+        - Review the technical design for feasibility and alignment with requirements.
+        - Once ready, ask for explicit approval.
       - **Mode-Specific Progression:**
-        - **In STEP-THROUGH mode:** Only once all ambiguities are resolved AND you have recorded the feedback using sc_feedback, ask for final, explicit approval. **You must not call spec sc_approve in the same turn as sc_feedback. You MUST have called sc_analyze for the current document.**
+        - **In STEP-THROUGH mode:** Only once all ambiguities are resolved, ask for final, explicit approval.
         - **In ONE-SHOT mode:** Once all ambiguities are resolved autonomously, IMMEDIATELY run `spec sc_plan` to scaffold the tasks phase.
       - The model MUST make modifications to the design document if the user requests changes or does not explicitly approve
       - The model MUST NOT call sc_plan to transition to the implementation plan until receiving clear approval (such as "yes", "approved", "looks good", etc.)
@@ -1250,16 +1235,11 @@ x-shared-resources:
         - Business process changes or organizational changes
         - Marketing or communication activities
         - Any task that cannot be completed through writing, modifying, or testing code
-      - After updating the tasks document, the model MUST enter the Ambiguity Resolution Loop:
-        - **Dedicated Analysis Action**: You MUST call the `sc_analyze` tool. This will provide you with a specific self-critique prompt for the task list.
-        - Perform a thorough self-review of the task list for missing dependencies or unclear steps based on the `sc_analyze` prompt.
-        - Use the sc_epoch tool to record open questions.
-        - **Mode-Specific Resolution:**
-          - **In STEP-THROUGH mode:** Ask the user targeted questions to resolve ambiguities. When using a prompter tool (like ask_user), you MUST ALWAYS include an 'Other' or open-ended text option. **When the user provides answers, use the spec sc_feedback tool to record them.** This will clear the open questions. DO NOT mistake information or answers for final approval. DO NOT ask for final approval (e.g., "Do the tasks look good?") yet. If answers raise new questions, continue this loop.
-          - **In ONE-SHOT mode:** Resolve all identified issues autonomously using your best judgment. Ensure all open questions recorded in sc_epoch are answered and closed. You DO NOT need to ask the user for approval.
-        - Only when you have zero open questions should you proceed.
+      - After updating the tasks document:
+        - Review the implementation task plan. Ensure task sizes are appropriate and dependencies are logically ordered.
+        - Once ready, ask for explicit approval.
       - **Mode-Specific Progression:**
-        - **In STEP-THROUGH mode:** Only once all ambiguities are resolved AND you have recorded the feedback using sc_feedback, ask for final, explicit approval. **You must not call spec sc_approve in the same turn as sc_feedback. You MUST have called sc_analyze for the current document.** After approval, stop and wait for the user to start the first task.
+        - **In STEP-THROUGH mode:** Only once all ambiguities are resolved, ask for final, explicit approval. After approval, stop and wait for the user to start the first task.
         - **In ONE-SHOT mode:** Once the task plan is complete and all ambiguities are resolved autonomously, IMMEDIATELY run `spec sc_todo_start --id <first_task_id>` to begin implementation.
       - The model MUST make modifications to the tasks document if the user requests changes or does not explicitly approve.
       - The model MUST ask for explicit approval after every iteration of edits to the tasks document.
@@ -1274,36 +1254,6 @@ x-shared-resources:
       - When the model receives the confirmation response for tasks stage, it will include the first uncompleted task
       - The model MUST present this task to the user and ask: "Ready to start the first task?"
       - The model MUST begin implementation only after user confirmation
-
-  testing-guide:
-    uri: testing-guide
-    title: Testing & Verification Guide
-    mimeType: text/markdown
-    text: |
-      # Testing & Verification Plan Generation
-
-      Workflow Stage: Testing & Verification
-
-      After all implementation tasks are complete, generate a verification plan to ensure the feature works as intended.
-
-      **Constraints:**
-
-      - The model MUST use the sc_epoch tool to continuously maintain the short-term memory of its current focus and open questions during the process
-      - The model MUST write the testing document in the user's preferred regional language
-      - The model MUST edit the existing testing.md file by removing the SPEC-MARKER comment block
-      - The model MUST provide a step-by-step list of verification actions based on the requirements and design
-      - **Mode-Specific Workflow:**
-        - **If in ONE-SHOT mode:**
-          1. Draft the testing document outlining automated and manual verification steps.
-          2. Implement and execute automated tests (unit, integration, and/or E2E) to satisfy the verification plan.
-          3. Autonomously diagnose and fix any failures encountered during test execution.
-          4. Once all tests pass and the feature is verified, IMMEDIATELY run `spec sc_plan` to finalize and archive the project.
-        - **If in STEP-THROUGH mode:**
-          1. Provide a step-by-step list of manual testing actions for the user to execute.
-          2. Ask the user: "Please execute these tests and provide feedback. Are there any issues, or is testing complete?"
-          3. If the user provides feedback requiring changes, suggest updates or address the issue directly.
-          4. Wait for clear approval from the user before using `sc_plan` to complete the workflow.
-      - The model MUST NOT proceed to completion until the feature is fully verified.
 
 # Global configuration
 x-global-config:
@@ -1328,14 +1278,12 @@ x-global-config:
     requirements: "Requirements Document"
     design: "Design Document"  
     tasks: "Task List"
-    testing: "Testing & Verification"
     completed: "Completed"
   
   file_names:
     requirements: "Requirements.md"
     design: "Design.md"
     tasks: "Tasks.md"
-    testing: "Testing.md"
 
 # Document templates
 x-document-templates:
@@ -1378,14 +1326,6 @@ x-document-templates:
         placeholder: "## Task Dependencies\n\n<template-tasks>\n- Task 1 must be completed before Task 2\n- Tasks 2.1 and 2.2 can be executed in parallel\n- Task 3 depends on completion of Tasks 1 and 2\n</template-tasks>"
       - name: "Estimated Timeline"
         placeholder: "## Estimated Timeline\n\n<template-tasks>\n- Task 1: 8 hours\n- Task 2: 12 hours\n- Task 3: 6 hours\n- **Total: 26 hours**\n</template-tasks>"
-
-  testing:
-    title: "${featureName} - Testing & Verification Plan"
-    sections:
-      - name: "Verification Steps"
-        placeholder: "## Verification Steps\n\n<template-testing>\nPlease provide a list of automated and manual verification actions to verify the feature.\n</template-testing>"
-      - name: "Results & Feedback"
-        placeholder: "## Results & Feedback\n\n<template-testing>\nRecord test results, automated test outputs, or user feedback here.\n</template-testing>"
 
   skipped:
     title: "${featureName} - ${stageName}"
