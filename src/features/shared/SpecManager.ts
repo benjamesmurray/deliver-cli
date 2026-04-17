@@ -238,13 +238,16 @@ export class SpecManager {
       }
 
       return `Project: spec-cli | Phase: ${phase}
+State Root: ${rootDir}
 Feature: ${featurePath.replace(baseDir, '').replace(/^[\/\\]/, '')}
 Requirements: ${reqStatus}
 Design: ${desStatus}
 Tasks: ${tskStatus}
 Next Step: ${nextSteps}${epochInfo}`;
     } catch (e: any) {
+      const rootDir = this.findProjectRoot(baseDir);
       return `Project: spec-cli | Phase: Error
+State Root: ${rootDir}
 Error: ${e.message}
 Next Step: Run \`spec sc_init --name "your-feature"\` to start a new feature.`;
     }
