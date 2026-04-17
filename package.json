@@ -1,12 +1,11 @@
 {
-  "name": "mcp-spec-cli",
-  "version": "1.15.1",
-  "description": "MCP server for managing spec workflow (requirements, design, implementation)",
+  "name": "@epoch-ai/deliver-cli",
+  "version": "1.0.0",
+  "description": "Streamlined MCP server for managing spec workflow (requirements, design, implementation)",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mcp-spec-cli": "dist/index.js",
-    "spec-cli": "dist/cli.js"
+    "deliver-cli": "dist/cli.js"
   },
   "files": [
     "dist/**/*",

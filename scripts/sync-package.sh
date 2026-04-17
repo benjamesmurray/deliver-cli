@@ -18,15 +18,13 @@ echo "📄 Generating package.json..."
 MAIN_VERSION=$(node -p "require('./package.json').version")
 cat > package/package.json << EOF
 {
-  "name": "mcp-spec-cli",
-  "version": "$MAIN_VERSION",
-  "description": "MCP server for managing spec workflow (requirements, design, implementation)",
+  "name": "@epoch-ai/deliver-cli",
+  "version": "1.0.0",
+  "description": "Streamlined MCP server for managing spec workflow (requirements, design, implementation)",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mcp-spec-cli": "dist/index.js",
-    "spec-cli": "dist/cli.js",
-    "spec-mcp": "dist/index.js"
+    "deliver-cli": "dist/cli.js"
   },
   "files": [
     "dist/**/*",
@@ -45,12 +43,12 @@ cat > package/package.json << EOF
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benjamesmurray/mcp-spec-cli.git"
+    "url": "git+https://github.com/benjamesmurray/deliver-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/benjamesmurray/mcp-spec-cli/issues"
+    "url": "https://github.com/benjamesmurray/deliver-cli/issues"
   },
-  "homepage": "https://github.com/benjamesmurray/mcp-spec-cli#readme",
+  "homepage": "https://github.com/benjamesmurray/deliver-cli#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@types/js-yaml": "^4.0.9",
@@ -64,67 +62,9 @@ cat > package/package.json << EOF
 }
 EOF
 
-# Generate README.md
-echo "📖 Generating README.md..."
-cat > package/README.md << 'EOF'
-# Spec Workflow MCP
-
-A Model Context Protocol (MCP) server for managing specification workflows including requirements, design, and implementation phases.
-
-## Features
-
-- **Requirements Management**: Create and validate requirement documents
-- **Design Documentation**: Generate and review design specifications
-- **Task Management**: Break down implementation into manageable tasks
-- **Progress Tracking**: Monitor workflow progress across all phases
-- **OpenAPI Integration**: Full OpenAPI 3.1.0 specification support
-
-## Installation
-
-```bash
-npm install -g spec-cli
-```
-
-## Usage
-
-### As MCP Server
-
-Add to your MCP client configuration:
-
-```json
-{
-  "mcpServers": {
-    "mcp-spec-cli": {
-      "command": "npx",
-      "args": ["-y", "mcp-spec-cli@latest"]
-    }
-  }
-}
-```
-
-### Available Operations
-
-- `sc_init` - Initialize a new feature specification
-- `sc_plan` - Progress the workflow to the next state
-- `sc_status` - Get current workflow status and next steps
-- `sc_todo_list` - List all implementation tasks
-- `sc_todo_start` - Mark a task as actively being worked on
-- `sc_todo_complete` - Mark tasks as completed
-- `sc_epoch` - Update context for short-term memory
-- `sc_mode` - Toggle between one-shot and step-through modes
-- `sc_archive` - Manually move project to completed directory
-- `sc_verify` - Validate the last action worked
-- `sc_refresh` - Force a refresh and synchronization of the internal workflow state machine
-- `sc_help` - Show help documentation
-
-## Documentation
-
-For detailed usage instructions and examples, visit the [GitHub repository](https://github.com/benjamesmurray/mcp-spec-cli).
-
-## License
-
-MIT
-EOF
+# Copy README.md
+echo "📖 Copying README.md..."
+cp README.md package/README.md
 
 # Copy OpenAPI specification
 echo "📋 Copying OpenAPI specification..."
