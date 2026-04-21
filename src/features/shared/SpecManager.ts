@@ -162,15 +162,15 @@ export class SpecManager {
       const isArchived = featurePath.includes(join(rootDir, 'projects', 'completed')) || 
                         featurePath.includes(join(rootDir, 'completed'));
 
-      const formatStatus = (s: { exists: boolean, edited: boolean, approved: boolean }, label: string) => {
+      const formatStatus = (s: { exists: boolean, edited: boolean, approved: boolean }, label: string, draftLabel: string = 'Draft') => {
           if (!s.exists) return 'Missing';
-          if (!s.edited) return 'Pending Edits';
+          if (!s.edited) return draftLabel;
           if (!s.approved) return 'Reviewing';
           return label;
       };
 
-      const reqStatus = formatStatus(state.requirements, 'Drafted');
-      const desStatus = formatStatus(state.design, 'Drafted');
+      const reqStatus = formatStatus(state.requirements, 'Drafted', 'Draft (Ready for design)');
+      const desStatus = formatStatus(state.design, 'Drafted', 'Draft (Ready for tasks)');
       
       let allTasksComplete = false;
       if (state.tasks.exists && state.tasks.edited) {
@@ -180,7 +180,7 @@ export class SpecManager {
         const areTasksDone = (ts: any[]): boolean => ts.every(t => t.completed && (t.children.length === 0 || areTasksDone(t.children)));
         allTasksComplete = tasks.length > 0 && areTasksDone(tasks);
       }
-      const tskStatus = allTasksComplete ? 'Completed' : formatStatus(state.tasks, 'Active');
+      const tskStatus = allTasksComplete ? 'Completed' : formatStatus(state.tasks, 'Active', 'Draft (Ready for dev)');
 
       let nextSteps = '';
       let phase = 'Specify';
@@ -194,7 +194,7 @@ export class SpecManager {
          nextSteps = 'Run `spec sc_init` to initialize requirements.';
       } else if (!state.requirements.edited) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
-         nextSteps = '⚠️ [ACTION REQUIRED] Complete drafting requirements and remove all `<template-requirements>` tags.';
+         nextSteps = '💡 Next Step: Review requirements or transition to design using `spec sc_plan`.';
       } else if (!state.requirements.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
          if (mode === 'one-shot') {
@@ -207,7 +207,7 @@ export class SpecManager {
          nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the design phase.';
       } else if (!state.design.edited) {
          phase = WorkflowStateRepository.getStageDisplayName('design');
-         nextSteps = '⚠️ [ACTION REQUIRED] Complete drafting design and remove all `<template-design>` tags.';
+         nextSteps = '💡 Next Step: Review design or transition to tasks using `spec sc_plan`.';
       } else if (!state.design.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('design');
          if (mode === 'one-shot') {
@@ -220,7 +220,7 @@ export class SpecManager {
          nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the tasks phase.';
       } else if (!state.tasks.edited) {
          phase = WorkflowStateRepository.getStageDisplayName('tasks');
-         nextSteps = '⚠️ [ACTION REQUIRED] Complete drafting tasks and remove all `<template-tasks>` tags.';
+         nextSteps = '💡 Next Step: Review tasks or transition to implementation using `spec sc_todo_start`.';
       } else if (!state.tasks.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('tasks');
          if (mode === 'one-shot') {
@@ -255,7 +255,7 @@ export class SpecManager {
       }
 
       if (isPlanningPhase) {
-          nextSteps = `🛑 STRICT MANDATE: You are in the Planning Phase. You MUST NOT write source code. Use \`spec sc_plan\` only after approval.\n\n${nextSteps}`;
+          nextSteps = `ℹ️ Phase: ${phase}. (Note: Source code implementation begins in the Build phase).\n\n${nextSteps}`;
       }
 
       let epochInfo = '';

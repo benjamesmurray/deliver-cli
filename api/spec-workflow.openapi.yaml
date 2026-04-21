@@ -330,7 +330,7 @@ components:
             📝 Created: requirements.md
             
             📊 Overall progress: ${progress}%
-            🔄 Current status: Writing requirements document (current) → Next step: ⚠️ [ACTION REQUIRED] Complete drafting requirements and remove all <template-requirements> tags.
+            🔄 Current status: Writing requirements document (current) → Next step: 💡 Next Step: Review requirements or transition to design using `spec sc_plan`.
             
             Model please continue with the following actions:
             1. Read the requirements-guide below

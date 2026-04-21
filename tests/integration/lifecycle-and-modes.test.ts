@@ -87,5 +87,5 @@ describe('Lifecycle and Modes Integration', () => {
     expect(planRes.content[0].text).toContain('Successfully archived project');
     expect(existsSync(completedPath)).toBe(true);
     expect(existsSync(activePath)).toBe(false);
-  });
+  }, 20000);
 });

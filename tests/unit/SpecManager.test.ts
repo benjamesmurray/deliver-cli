@@ -103,11 +103,11 @@ describe('SpecManager', () => {
       expect(summary).toContain('Requirements: Missing');
       expect(summary).toContain('Design: Missing');
       expect(summary).toContain('Tasks: Missing');
-      expect(summary).toContain('🛑 STRICT MANDATE: You are in the Planning Phase');
+      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
       expect(summary).toContain('Run `spec sc_init` to initialize requirements.');
     });
 
-    it('should return pending edits if document contains <template-*> tags', () => {
+    it('should return draft status if document contains <template-*> tags', () => {
       const featureName = 'test-feature';
       const featurePath = join(tempDir, featureName);
       mkdirSync(featurePath);
@@ -116,9 +116,9 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, reqFile), 'Content\n<template-requirements>\nPlaceholder\n</template-requirements>', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Requirements: Pending Edits');
-      expect(summary).toContain('🛑 STRICT MANDATE: You are in the Planning Phase');
-      expect(summary).toContain('⚠️ [ACTION REQUIRED] Complete drafting requirements and remove all `<template-requirements>` tags.');
+      expect(summary).toContain('Requirements: Draft (Ready for design)');
+      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
+      expect(summary).toContain('💡 Next Step: Review requirements or transition to design using `spec sc_plan`.');
     });
 
     it('should return Reviewing if document exists and has no <template-*> tags', () => {
@@ -132,7 +132,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('Requirements: Reviewing');
       expect(summary).toContain('Design: Missing');
-      expect(summary).toContain('🛑 STRICT MANDATE: You are in the Planning Phase');
+      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
       expect(summary).toContain('🔍 [REVIEW] Requirements drafted. Review and run `spec sc_approve` when ready.');
     });
 
@@ -147,7 +147,7 @@ describe('SpecManager', () => {
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('Requirements: Reviewing');
-      expect(summary).toContain('🛑 STRICT MANDATE: You are in the Planning Phase');
+      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
       expect(summary).toContain('🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the design phase.');
     });
     
@@ -177,8 +177,8 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('design')), '<template-design>placeholder</template-design>', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Design: Pending Edits');
-      expect(summary).toContain('⚠️ [ACTION REQUIRED] Complete drafting design and remove all `<template-design>` tags.');
+      expect(summary).toContain('Design: Draft (Ready for tasks)');
+      expect(summary).toContain('💡 Next Step: Review design or transition to tasks using `spec sc_plan`.');
     });
 
     it('should return approved state when approval marker exists', () => {

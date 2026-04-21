@@ -45,7 +45,7 @@ describe('Workflow State Diagram Integration', () => {
     const initRes = await tools['sc_init'].callback({ 
       name: featureName, description: 'Testing state transitions' 
     }, {});
-    expect(initRes.content[0].text).toContain('Requirements: Pending Edits');
+    expect(initRes.content[0].text).toContain('Requirements: Draft (Ready for design)');
     expect(initRes.content[0].text).toContain('Phase: Requirements Document');
 
     // Requirements --> Design: sc_plan (resolve ambiguities & approve)
@@ -61,7 +61,7 @@ describe('Workflow State Diagram Integration', () => {
     await tools['sc_approve'].callback({}, {});
     const planToDesign = await tools['sc_plan'].callback({}, {});
     expect(planToDesign.content[0].text).toContain(`Requirements complete. Scaffolding ${desFile}.`);
-    expect(planToDesign.content[0].text).toContain('Design: Pending Edits');
+    expect(planToDesign.content[0].text).toContain('Design: Draft (Ready for tasks)');
     expect(planToDesign.content[0].text).toContain('Phase: Design Document');
 
     // Design --> Tasks: sc_plan (resolve ambiguities & approve)
@@ -77,7 +77,7 @@ describe('Workflow State Diagram Integration', () => {
     await tools['sc_approve'].callback({}, {});
     const planToTasks = await tools['sc_plan'].callback({}, {});
     expect(planToTasks.content[0].text).toContain(`Design complete. Scaffolding ${tskFile}.`);
-    expect(planToTasks.content[0].text).toContain('Tasks: Pending Edits');
+    expect(planToTasks.content[0].text).toContain('Tasks: Draft (Ready for dev)');
     expect(planToTasks.content[0].text).toContain('Phase: Task List');
 
     // Tasks --> Implementation: sc_todo_* (add dependencies, annotate tasks from design, & approve)
