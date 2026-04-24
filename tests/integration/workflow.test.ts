@@ -44,7 +44,7 @@ describe('Spec CLI Workflow Integration', () => {
     // 1. Initialize
     const initRes = await tools['sc_init'].callback({ name: featureName, description: 'Add payments' }, {});
     expect(initRes.content[0].text).toContain('Requirements: Draft (Ready for design)');
-    expect(initRes.content[0].text).toContain('💡 Next Step: Review requirements or transition to design using `spec sc_plan`.');
+    expect(initRes.content[0].text).toContain('💡 Next Step: After `spec sc_init`, write the contents of the requirements.md file, then run `spec sc_plan` to move through the workflow.');
 
     // 2. plan (with requirements not finished)
     const planRes1 = await tools['sc_plan'].callback({ instruction: 'Use Stripe' }, {});

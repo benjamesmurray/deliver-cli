@@ -194,7 +194,7 @@ export class SpecManager {
          nextSteps = 'Run `spec sc_init` to initialize requirements.';
       } else if (!state.requirements.edited) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
-         nextSteps = '💡 Next Step: Review requirements or transition to design using `spec sc_plan`.';
+         nextSteps = '💡 Next Step: After `spec sc_init`, write the contents of the requirements.md file, then run `spec sc_plan` to move through the workflow.';
       } else if (!state.requirements.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
          if (mode === 'one-shot') {
@@ -207,7 +207,7 @@ export class SpecManager {
          nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the design phase.';
       } else if (!state.design.edited) {
          phase = WorkflowStateRepository.getStageDisplayName('design');
-         nextSteps = '💡 Next Step: Review design or transition to tasks using `spec sc_plan`.';
+         nextSteps = '💡 Next Step: Write the contents of the design.md file, then run `spec sc_plan` to move through the workflow.';
       } else if (!state.design.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('design');
          if (mode === 'one-shot') {
@@ -220,7 +220,7 @@ export class SpecManager {
          nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the tasks phase.';
       } else if (!state.tasks.edited) {
          phase = WorkflowStateRepository.getStageDisplayName('tasks');
-         nextSteps = '💡 Next Step: Review tasks or transition to implementation using `spec sc_todo_start`.';
+         nextSteps = '💡 Next Step: Write the contents of the tasks.md file, then run `spec sc_todo_start` to begin implementation.';
       } else if (!state.tasks.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('tasks');
          if (mode === 'one-shot') {

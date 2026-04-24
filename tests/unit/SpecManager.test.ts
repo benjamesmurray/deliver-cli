@@ -118,7 +118,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('Requirements: Draft (Ready for design)');
       expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
-      expect(summary).toContain('💡 Next Step: Review requirements or transition to design using `spec sc_plan`.');
+      expect(summary).toContain('💡 Next Step: After `spec sc_init`, write the contents of the requirements.md file, then run `spec sc_plan` to move through the workflow.');
     });
 
     it('should return Reviewing if document exists and has no <template-*> tags', () => {
@@ -178,7 +178,7 @@ describe('SpecManager', () => {
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('Design: Draft (Ready for tasks)');
-      expect(summary).toContain('💡 Next Step: Review design or transition to tasks using `spec sc_plan`.');
+      expect(summary).toContain('💡 Next Step: Write the contents of the design.md file, then run `spec sc_plan` to move through the workflow.');
     });
 
     it('should return approved state when approval marker exists', () => {
