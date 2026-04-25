@@ -330,7 +330,7 @@ components:
             📝 Created: requirements.md
             
             📊 Overall progress: ${progress}%
-            🔄 Current status: Writing requirements document (current) → Next step: 💡 Next Step: After `spec sc_init`, write the contents of the requirements.md file, then run `spec sc_plan` to move through the workflow.
+            🔄 Current status: Writing requirements document (current) → Next step: 💡 Next Step: Write the contents of the requirements.md file, then run `spec sc_plan` to move through the workflow.
             
             Model please continue with the following actions:
             1. Read the requirements-guide below

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, writeFileSync, readFileSync, renameSync, cpSync, rmSync } from 'fs';
-import { join, basename, dirname } from 'path';
+import { join, basename, dirname, isAbsolute } from 'path';
 import { parseArgs } from 'util';
 import { SpecManager } from './features/shared/SpecManager.js';
 import { TemplateRepository } from './features/shared/templateRepository.js';
@@ -75,10 +75,17 @@ async function main() {
     const baseDir = process.cwd();
 
     if (command === 'help' || values.help) {
-      if (subcommand === 'exec') {
-        const topic = positionals[2];
-        if (topic === 'init') {
-          output = `
+      let topic = '';
+      if (command === 'help') {
+        topic = subcommand;
+        if (topic === 'exec') topic = positionals[2];
+      } else {
+        topic = command;
+        if (topic === 'exec') topic = subcommand;
+      }
+
+      if (topic === 'init') {
+        output = `
 Initialize a new feature specification.
 
 Usage:
@@ -89,8 +96,8 @@ Flags:
   --description <text>  Brief overview of the feature.
   --mode <mode>         Set workflow mode: 'step-through' (default) or 'one-shot'.
 `;
-        } else if (topic === 'plan') {
-          output = `
+      } else if (topic === 'plan') {
+        output = `
 Progress the workflow to the next state (e.g., Requirements -> Design).
 Scaffolds the next document based on the current state.
 
@@ -101,8 +108,8 @@ Flags:
   --feature <name>      Target feature name.
   --instruction <text>  Add specific guidance or updates for the next phase.
 `;
-        } else if (topic === 'approve') {
-          output = `
+      } else if (topic === 'approve') {
+        output = `
 Explicitly approve the current drafted phase.
 This is required in 'step-through' mode before calling 'spec sc_plan' to move to the next phase.
 
@@ -112,8 +119,8 @@ Usage:
 Flags:
   --feature <name>      Target feature name.
 `;
-        } else if (topic === 'todo') {
-          output = `
+      } else if (topic === 'todo') {
+        output = `
 Manage implementation tasks.
 
 Usage:
@@ -125,8 +132,8 @@ Flags:
   --feature <name>      Target feature name.
   --id <id>             The task ID (e.g., "1.1").
 `;
-        } else if (topic === 'epoch') {
-          output = `
+      } else if (topic === 'epoch') {
+        output = `
 Update context for short-term memory. 
 Helps agents maintain continuity across sessions.
 
@@ -140,8 +147,8 @@ Flags:
   --hypotheses <text>   Assumptions about the architecture or solution.
   --openQuestions <text> Questions pending user feedback.
 `;
-        } else if (topic === 'archive') {
-          output = `
+      } else if (topic === 'archive') {
+        output = `
 Manually move the project to the completed directory.
 
 Usage:
@@ -150,8 +157,8 @@ Usage:
 Flags:
   --feature <name>      Target feature name.
 `;
-        } else if (topic === 'mode') {
-          output = `
+      } else if (topic === 'mode') {
+        output = `
 Toggle project mode between 'one-shot' and 'step-through'.
 
 Usage:
@@ -161,31 +168,8 @@ Flags:
   --feature <name>      Target feature name.
   <mode>                'one-shot' or 'step-through'.
 `;
-        } else {
-          output = `
-Perform an action as part of the specification workflow.
-
-Usage:
-  spec [command]
-
-Available Commands:
-  spec sc_init          Initialize a new feature.
-  spec sc_plan          Progress the workflow state.
-  spec sc_approve       Approve the current drafted phase.
-  spec sc_todo_list     List implementation tasks.
-  spec sc_todo_start    Start a task.
-  spec sc_todo_complete Complete a task.
-  spec sc_epoch         Update short-term memory context.
-  spec sc_archive       Manually archive the project.
-  spec sc_mode          Toggle between 'one-shot' and 'step-through'.
-
-Use "spec sc_help [command]" for more information about a command.
-`;
-        }
-      } else {
-        const topic = positionals[1];
-        if (topic === 'status') {
-          output = `
+      } else if (topic === 'status') {
+        output = `
 Get a health check of the active project and discover next steps.
 
 Usage:
@@ -194,8 +178,8 @@ Usage:
 Flags:
   --feature <name>      Target feature name.
 `;
-        } else if (topic === 'verify') {
-          output = `
+      } else if (topic === 'verify') {
+        output = `
 Verify current state and check consistency. 
 A dedicated tool to validate that the last action worked.
 
@@ -205,8 +189,8 @@ Usage:
 Flags:
   --feature <name>      Target feature name.
 `;
-        } else {
-          output = `
+      } else {
+        output = `
 MCP server for managing spec workflow (requirements, design, implementation).
 
 Usage:
@@ -234,7 +218,6 @@ Flags:
 
 Use "spec sc_help [command]" for more information about a command.
 `;
-        }
       }
       console.log(output);
       Logger.logCommand(process.argv.slice(2).join(' '), [], output);
@@ -263,7 +246,9 @@ Use "spec sc_help [command]" for more information about a command.
           SpecManager.setMode(featurePath, values.mode as 'one-shot' | 'step-through');
         }
 
-        const reqPath = join(featurePath, WorkflowStateRepository.getStageFileName('requirements'));
+        const reqFileName = WorkflowStateRepository.getStageFileName('requirements');
+        const reqPath = join(featurePath, reqFileName);
+        let created = false;
         if (!exists(reqPath)) {
           const content = TemplateRepository.getInterpolatedTemplate('requirements', { 
             featureName, 
@@ -271,9 +256,15 @@ Use "spec sc_help [command]" for more information about a command.
           });
           writeFileSync(reqPath, content, 'utf-8');
           writeFileSync(join(featurePath, '.epoch-context.md'), `# Epoch Context\n\n**Current Phase:** Requirements\n\n`, 'utf-8');
+          created = true;
         }
 
-        output = "Ensure you move through all phases: sc_init, sc_plan, sc_approve, and sc_todo_*.\n\n" + SpecManager.getStatusSummary(baseDir, featureName);
+        const absReqPath = isAbsolute(reqPath) ? reqPath : join(process.cwd(), reqPath);
+        const confirmation = created 
+          ? `✅ Created new requirements template at: ${absReqPath}`
+          : `ℹ️ Requirements already exist at: ${absReqPath}`;
+
+        output = `${confirmation}\n\n${SpecManager.getStatusSummary(baseDir, featureName)}`;
         console.log(output);
       } 
       else if (subcommand === 'mode') {
