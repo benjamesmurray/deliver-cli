@@ -194,7 +194,7 @@ export class SpecManager {
          nextSteps = 'Run `spec sc_init` to initialize requirements.';
       } else if (!state.requirements.edited) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
-         nextSteps = '💡 Next Step: Write the contents of the requirements.md file, then run `spec sc_plan` to move through the workflow.';
+         nextSteps = '💡 Next Step: Read the template requirements.md file created to understand the layout, and then write the contents of the requirements.md file for this project, then run `spec sc_plan` to move through the workflow.';
       } else if (!state.requirements.approved) {
          phase = WorkflowStateRepository.getStageDisplayName('requirements');
          if (mode === 'one-shot') {

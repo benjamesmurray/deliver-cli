@@ -118,7 +118,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('Requirements: Draft (Ready for design)');
       expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
-      expect(summary).toContain('💡 Next Step: Write the contents of the requirements.md file, then run `spec sc_plan` to move through the workflow.');
+      expect(summary).toContain('💡 Next Step: Read the template requirements.md file created to understand the layout, and then write the contents of the requirements.md file for this project, then run `spec sc_plan` to move through the workflow.');
     });
 
     it('should return Reviewing if document exists and has no <template-*> tags', () => {
