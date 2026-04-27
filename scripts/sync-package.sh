@@ -62,9 +62,10 @@ cat > package/package.json << EOF
 }
 EOF
 
-# Copy README.md
-echo "📖 Copying README.md..."
+# Copy README.md and README-zh.md
+echo "📖 Copying README files..."
 cp README.md package/README.md
+cp README-zh.md package/README-zh.md
 
 # Copy OpenAPI specification
 echo "📋 Copying OpenAPI specification..."

@@ -43,8 +43,8 @@ describe('Spec CLI Workflow Integration', () => {
 
     // 1. Initialize
     const initRes = await tools['sc_init'].callback({ name: featureName, description: 'Add payments' }, {});
-    expect(initRes.content[0].text).toContain('Requirements: Draft (Ready for design)');
-    expect(initRes.content[0].text).toContain('💡 Next Step: Read the template requirements.md file created to understand the layout, and then write the contents of the requirements.md file for this project, then run `spec sc_plan` to move through the workflow.');
+    expect(initRes.content[0].text).toContain('status: drafting');
+    expect(initRes.content[0].text).toContain('next_step: Write requirements.md and use mcpx spec sc_plan to advance.');
 
     // 2. plan (with requirements not finished)
     const planRes1 = await tools['sc_plan'].callback({ instruction: 'Use Stripe' }, {});
@@ -57,12 +57,12 @@ describe('Spec CLI Workflow Integration', () => {
 
     // 3.5. Approve requirements
     const approveReqRes = await tools['sc_approve'].callback({}, {});
-    expect(approveReqRes.content[0].text).toContain('Requirements Document" has been approved');
+    expect(approveReqRes.content[0].text).toContain('Requirements Document" approved');
 
     // 4. plan (advancing to Design)
     const planRes2 = await tools['sc_plan'].callback({}, {});
     expect(planRes2.content[0].text).toContain(`Requirements complete. Scaffolding ${desFile}.`);
-    expect(planRes2.content[0].text).toContain('Design: Draft (Ready for tasks)');
+    expect(planRes2.content[0].text).toContain('status: drafting');
 
     // 5. Simulate AI finishing the design document
     const desPath = join(tempDir, 'projects', 'active', featureName, desFile);
@@ -70,12 +70,12 @@ describe('Spec CLI Workflow Integration', () => {
 
     // 5.5. Approve design
     const approveDesRes = await tools['sc_approve'].callback({}, {});
-    expect(approveDesRes.content[0].text).toContain('Design Document" has been approved');
+    expect(approveDesRes.content[0].text).toContain('Design Document" approved');
 
     // 6. plan (advancing to Tasks)
     const planRes3 = await tools['sc_plan'].callback({}, {});
     expect(planRes3.content[0].text).toContain(`Design complete. Scaffolding ${tskFile}.`);
-    expect(planRes3.content[0].text).toContain('Tasks: Draft (Ready for dev)');
+    expect(planRes3.content[0].text).toContain('status: drafting');
 
     // 7. Simulate AI writing tasks
     const tasksPath = join(tempDir, 'projects', 'active', featureName, tskFile);
@@ -83,12 +83,12 @@ describe('Spec CLI Workflow Integration', () => {
 
     // 7.5. Approve tasks
     const approveTskRes = await tools['sc_approve'].callback({}, {});
-    expect(approveTskRes.content[0].text).toContain('Task List" has been approved');
+    expect(approveTskRes.content[0].text).toContain('Task List" approved');
 
     // 8. sc_status (everything ready)
     const statusRes = await tools['sc_status'].callback({}, {});
-    expect(statusRes.content[0].text).toContain('Tasks: Active');
-    expect(statusRes.content[0].text).toContain('🚀 [IMPLEMENTATION] Proceed with tasks. Run `spec sc_todo_start` to begin.');
+    expect(statusRes.content[0].text).toContain('status: active');
+    expect(statusRes.content[0].text).toContain('next_step: Proceed with tasks using mcpx spec sc_todo_start.');
 
     // 9. todo (Complete a task)
     const todoRes = await tools['sc_todo_complete'].callback({ feature: featureName, id: '1.1' }, {});

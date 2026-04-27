@@ -100,14 +100,12 @@ describe('SpecManager', () => {
       const featureName = 'test-feature';
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       
-      expect(summary).toContain('Requirements: Missing');
-      expect(summary).toContain('Design: Missing');
-      expect(summary).toContain('Tasks: Missing');
-      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
-      expect(summary).toContain('Run `spec sc_init` to initialize requirements.');
+      expect(summary).toContain('spec_status:');
+      expect(summary).toContain('phase: requirements');
+      expect(summary).toContain('next_step: use mcpx spec sc_init to initialize requirements.');
     });
 
-    it('should return draft status if document contains <template-*> tags', () => {
+    it('should return draft status and blocker if document contains <template-*> tags', () => {
       const featureName = 'test-feature';
       const featurePath = join(tempDir, featureName);
       mkdirSync(featurePath);
@@ -116,12 +114,12 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, reqFile), 'Content\n<template-requirements>\nPlaceholder\n</template-requirements>', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Requirements: Draft (Ready for design)');
-      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
-      expect(summary).toContain('💡 Next Step: Read the template requirements.md file created to understand the layout, and then write the contents of the requirements.md file for this project, then run `spec sc_plan` to move through the workflow.');
+      expect(summary).toContain('status: drafting');
+      expect(summary).toContain('blockers: [template_tags_present]');
+      expect(summary).toContain('next_step: Write requirements.md and use mcpx spec sc_plan to advance.');
     });
 
-    it('should return Reviewing if document exists and has no <template-*> tags', () => {
+    it('should return reviewing if document exists and has no <template-*> tags', () => {
       const featureName = 'test-feature';
       const featurePath = join(tempDir, 'projects', 'active', featureName);
       mkdirSync(featurePath, { recursive: true });
@@ -130,10 +128,9 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, reqFile), 'Completed requirements without tags', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Requirements: Reviewing');
-      expect(summary).toContain('Design: Missing');
-      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
-      expect(summary).toContain('🔍 [REVIEW] Requirements drafted. Review and run `spec sc_approve` when ready.');
+      expect(summary).toContain('status: reviewing');
+      expect(summary).toContain('phase: requirements');
+      expect(summary).toContain('next_step: Review and use mcpx spec sc_approve.');
     });
 
     it('should return one-shot specific instructions when mode is one-shot', () => {
@@ -146,9 +143,9 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, reqFile), 'Completed requirements without tags', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Requirements: Reviewing');
-      expect(summary).toContain('ℹ️ Phase: Requirements Document. (Note: Source code implementation begins in the Build phase).');
-      expect(summary).toContain('🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the design phase.');
+      expect(summary).toContain('status: reviewing');
+      expect(summary).toContain('mode: one-shot');
+      expect(summary).toContain('next_step: Resolve ambiguities then use mcpx spec sc_plan.');
     });
     
     it('should handle full workflow Reviewing state', () => {
@@ -161,9 +158,8 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('tasks')), 'Tsk', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Requirements: Reviewing');
-      expect(summary).toContain('Design: Reviewing');
-      expect(summary).toContain('Tasks: Reviewing');
+      expect(summary).toContain('status: reviewing');
+      expect(summary).toContain('phase: requirements'); // It picks the first non-approved phase
     });
 
     it('should return Action Required if a middle stage is pending edits', () => {
@@ -177,8 +173,9 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, WorkflowStateRepository.getStageFileName('design')), '<template-design>placeholder</template-design>', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Design: Draft (Ready for tasks)');
-      expect(summary).toContain('💡 Next Step: Write the contents of the design.md file, then run `spec sc_plan` to move through the workflow.');
+      expect(summary).toContain('phase: design');
+      expect(summary).toContain('status: drafting');
+      expect(summary).toContain('next_step: Write design.md and use mcpx spec sc_plan to advance.');
     });
 
     it('should return approved state when approval marker exists', () => {
@@ -191,8 +188,8 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, '.spec-requirements-approved'), '2026-04-10', 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('Requirements: Drafted');
-      expect(summary).toContain('✅ [APPROVED] Run `spec sc_plan` to scaffold the design phase.');
+      expect(summary).toContain('status: approved');
+      expect(summary).toContain('next_step: use mcpx spec sc_plan to scaffold design.');
     });
 
     it('should include epoch context in status summary if file exists', () => {
@@ -204,7 +201,7 @@ describe('SpecManager', () => {
       writeFileSync(join(featurePath, '.epoch-context.md'), epochContent, 'utf-8');
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
-      expect(summary).toContain('--- Epoch Context ---');
+      expect(summary).toContain('epoch_context:');
       expect(summary).toContain('Active Focus');
       expect(summary).toContain('Working on tests');
     });

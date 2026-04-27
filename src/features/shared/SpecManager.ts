@@ -150,7 +150,7 @@ export class SpecManager {
   }
 
   /**
-   * Returns a dense Markdown output representing the current status.
+   * Returns a compact TOON output representing the current status.
    */
   static getStatusSummary(baseDir: string, featureName?: string): string {
     try {
@@ -162,16 +162,6 @@ export class SpecManager {
       const isArchived = featurePath.includes(join(rootDir, 'projects', 'completed')) || 
                         featurePath.includes(join(rootDir, 'completed'));
 
-      const formatStatus = (s: { exists: boolean, edited: boolean, approved: boolean }, label: string, draftLabel: string = 'Draft') => {
-          if (!s.exists) return 'Missing';
-          if (!s.edited) return draftLabel;
-          if (!s.approved) return 'Reviewing';
-          return label;
-      };
-
-      const reqStatus = formatStatus(state.requirements, 'Drafted', 'Draft (Ready for design)');
-      const desStatus = formatStatus(state.design, 'Drafted', 'Draft (Ready for tasks)');
-      
       let allTasksComplete = false;
       if (state.tasks.exists && state.tasks.edited) {
         const tasksPath = join(featurePath, WorkflowStateRepository.getStageFileName('tasks'));
@@ -180,104 +170,95 @@ export class SpecManager {
         const areTasksDone = (ts: any[]): boolean => ts.every(t => t.completed && (t.children.length === 0 || areTasksDone(t.children)));
         allTasksComplete = tasks.length > 0 && areTasksDone(tasks);
       }
-      const tskStatus = allTasksComplete ? 'Completed' : formatStatus(state.tasks, 'Active', 'Draft (Ready for dev)');
 
       let nextSteps = '';
-      let phase = 'Specify';
-      let isPlanningPhase = !isArchived;
+      let phase = 'specify';
+      let status = 'drafting';
+      const blockers: string[] = [];
 
       if (isArchived) {
-          phase = 'Completed';
-          nextSteps = 'Feature workflow is complete. This project is archived.';
+          phase = 'completed';
+          status = 'archived';
+          nextSteps = 'Feature workflow complete.';
       } else if (!state.requirements.exists) {
-         phase = WorkflowStateRepository.getStageDisplayName('requirements');
-         nextSteps = 'Run `spec sc_init` to initialize requirements.';
+         phase = 'requirements';
+         nextSteps = 'use mcpx spec sc_init to initialize requirements.';
       } else if (!state.requirements.edited) {
-         phase = WorkflowStateRepository.getStageDisplayName('requirements');
-         nextSteps = '💡 Next Step: Read the template requirements.md file created to understand the layout, and then write the contents of the requirements.md file for this project, then run `spec sc_plan` to move through the workflow.';
+         phase = 'requirements';
+         status = 'drafting';
+         blockers.push('template_tags_present');
+         nextSteps = 'Write requirements.md and use mcpx spec sc_plan to advance.';
       } else if (!state.requirements.approved) {
-         phase = WorkflowStateRepository.getStageDisplayName('requirements');
+         phase = 'requirements';
+         status = 'reviewing';
          if (mode === 'one-shot') {
-            nextSteps = '🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the design phase.';
+            nextSteps = 'Resolve ambiguities then use mcpx spec sc_plan.';
          } else {
-            nextSteps = '🔍 [REVIEW] Requirements drafted. Review and run `spec sc_approve` when ready.';
+            nextSteps = 'Review and use mcpx spec sc_approve.';
          }
       } else if (!state.design.exists) {
-         phase = WorkflowStateRepository.getStageDisplayName('requirements');
-         nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the design phase.';
+         phase = 'requirements';
+         status = 'approved';
+         nextSteps = 'use mcpx spec sc_plan to scaffold design.';
       } else if (!state.design.edited) {
-         phase = WorkflowStateRepository.getStageDisplayName('design');
-         nextSteps = '💡 Next Step: Write the contents of the design.md file, then run `spec sc_plan` to move through the workflow.';
+         phase = 'design';
+         status = 'drafting';
+         blockers.push('template_tags_present');
+         nextSteps = 'Write design.md and use mcpx spec sc_plan to advance.';
       } else if (!state.design.approved) {
-         phase = WorkflowStateRepository.getStageDisplayName('design');
+         phase = 'design';
+         status = 'reviewing';
          if (mode === 'one-shot') {
-            nextSteps = '🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the tasks phase.';
+            nextSteps = 'Resolve ambiguities then use mcpx spec sc_plan.';
          } else {
-            nextSteps = '🔍 [REVIEW] Design drafted. Review and run `spec sc_approve` when ready.';
+            nextSteps = 'Review and use mcpx spec sc_approve.';
          }
       } else if (!state.tasks.exists) {
-         phase = WorkflowStateRepository.getStageDisplayName('design');
-         nextSteps = '✅ [APPROVED] Run `spec sc_plan` to scaffold the tasks phase.';
+         phase = 'design';
+         status = 'approved';
+         nextSteps = 'use mcpx spec sc_plan to scaffold tasks.';
       } else if (!state.tasks.edited) {
-         phase = WorkflowStateRepository.getStageDisplayName('tasks');
-         nextSteps = '💡 Next Step: Write the contents of the tasks.md file, then run `spec sc_todo_start` to begin implementation.';
+         phase = 'tasks';
+         status = 'drafting';
+         blockers.push('template_tags_present');
+         nextSteps = 'Write tasks.md and use mcpx spec sc_todo_start to begin.';
       } else if (!state.tasks.approved) {
-         phase = WorkflowStateRepository.getStageDisplayName('tasks');
+         phase = 'tasks';
+         status = 'reviewing';
          if (mode === 'one-shot') {
-            let firstTaskId = '';
-            if (state.tasks.exists) {
-                const tasksPath = join(featurePath, WorkflowStateRepository.getStageFileName('tasks'));
-                const content = readFileSync(tasksPath, 'utf-8');
-                const tasks = TaskParser.parse(content);
-                const findFirst = (ts: any[]): any => {
-                    for (const t of ts) {
-                        if (!t.completed) return t;
-                        const found = findFirst(t.children);
-                        if (found) return found;
-                    }
-                    return null;
-                };
-                const first = findFirst(tasks);
-                if (first) firstTaskId = ` --id ${first.id}`;
-            }
-            nextSteps = `🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run \`spec sc_todo_start${firstTaskId}\` to begin implementation.`;
+            nextSteps = 'Resolve ambiguities then use mcpx spec sc_todo_start.';
          } else {
-            nextSteps = '🔍 [REVIEW] Tasks drafted. Review and run `spec sc_approve` when ready.';
+            nextSteps = 'Review and use mcpx spec sc_approve.';
          }
       } else if (!allTasksComplete) {
-         isPlanningPhase = false;
-         phase = 'Implementation';
-         nextSteps = '🚀 [IMPLEMENTATION] Proceed with tasks. Run `spec sc_todo_start` to begin.';
+         phase = 'implementation';
+         status = 'active';
+         nextSteps = 'Proceed with tasks using mcpx spec sc_todo_start.';
       } else {
-         isPlanningPhase = false;
-         phase = 'Completed';
-         nextSteps = 'Feature workflow is complete.';
-      }
-
-      if (isPlanningPhase) {
-          nextSteps = `ℹ️ Phase: ${phase}. (Note: Source code implementation begins in the Build phase).\n\n${nextSteps}`;
+         phase = 'completed';
+         status = 'finished';
+         nextSteps = 'Workflow complete.';
       }
 
       let epochInfo = '';
       const epochPath = join(featurePath, '.epoch-context.md');
       if (existsSync(epochPath)) {
           const epochContent = readFileSync(epochPath, 'utf-8');
-          epochInfo = `\n\n--- Epoch Context ---\n${epochContent.trim()}`;
+          epochInfo = epochContent.trim();
       }
 
-      return `Project: spec-cli | Phase: ${phase}
-State Root: ${rootDir}
-Feature: ${featurePath.replace(baseDir, '').replace(/^[\/\\]/, '')}
-Requirements: ${reqStatus}
-Design: ${desStatus}
-Tasks: ${tskStatus}
-Next Step: ${nextSteps}${epochInfo}`;
+      return `spec_status:
+  feature: ${featurePath.replace(rootDir, '').replace(/^[\/\\]/, '')}
+  phase: ${phase}
+  status: ${status}
+  next_step: ${nextSteps}
+  blockers: [${blockers.join(', ')}]
+  mode: ${mode}${epochInfo ? '\n  epoch_context: |\n    ' + epochInfo.replace(/\n/g, '\n    ') : ''}`;
     } catch (e: any) {
-      const rootDir = this.findProjectRoot(baseDir);
-      return `Project: spec-cli | Phase: Error
-State Root: ${rootDir}
-Error: ${e.message}
-Next Step: Run \`spec sc_init --name "your-feature"\` to start a new feature.`;
+      return `spec_status:
+  phase: error
+  error: ${e.message}
+  next_step: use mcpx spec sc_init --name "your-feature"`;
     }
   }
 
@@ -299,7 +280,7 @@ Next Step: Run \`spec sc_init --name "your-feature"\` to start a new feature.`;
                      return t.length > 0 && t.toLowerCase() !== 'none' && t !== '*';
                  });
                  if (hasRealQuestions) {
-                     throw new Error(`Cannot advance while there are active open questions in the epoch context. Please resolve them using \`spec sc_epoch --openQuestions "None"\`.`);
+                     throw new Error(`Cannot advance while there are active open questions in the epoch context. Please resolve them using \`use mcpx spec sc_epoch --openQuestions "None"\`.`);
                  }
             }
         }
@@ -329,13 +310,13 @@ Next Step: Run \`spec sc_init --name "your-feature"\` to start a new feature.`;
         const markerTime = new Date(readFileSync(feedbackMarker, 'utf-8')).getTime();
         const now = Date.now();
         if (now - markerTime < 2000) { // 2 seconds threshold
-            throw new Error('Approval blocked: Recent feedback was recorded. To prevent misinterpretation of information as approval, you must wait for a separate turn and explicit user approval before calling spec sc_approve.');
+            throw new Error('Approval blocked: Recent feedback was recorded. To prevent misinterpretation of information as approval, you must wait for a separate turn and explicit user approval before calling mcpx spec sc_approve.');
         }
         rmSync(feedbackMarker, { force: true });
     }
 
     const approvedPath = join(featurePath, `.spec-${phase}-approved`);
     writeFileSync(approvedPath, new Date().toISOString(), 'utf-8');
-    return `✅ Phase "${WorkflowStateRepository.getStageDisplayName(phase)}" has been approved. Run \`spec sc_plan\` to scaffold the next phase.`;
+    return `✅ Phase "${WorkflowStateRepository.getStageDisplayName(phase)}" approved. use mcpx spec sc_plan to scaffold next phase.`;
   }
 }

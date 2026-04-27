@@ -45,8 +45,8 @@ describe('Workflow State Diagram Integration', () => {
     const initRes = await tools['sc_init'].callback({ 
       name: featureName, description: 'Testing state transitions' 
     }, {});
-    expect(initRes.content[0].text).toContain('Requirements: Draft (Ready for design)');
-    expect(initRes.content[0].text).toContain('Phase: Requirements Document');
+    expect(initRes.content[0].text).toContain('status: drafting');
+    expect(initRes.content[0].text).toContain('phase: requirements');
 
     // Requirements --> Design: sc_plan (resolve ambiguities & approve)
     // First call shows pending edits
@@ -61,8 +61,8 @@ describe('Workflow State Diagram Integration', () => {
     await tools['sc_approve'].callback({}, {});
     const planToDesign = await tools['sc_plan'].callback({}, {});
     expect(planToDesign.content[0].text).toContain(`Requirements complete. Scaffolding ${desFile}.`);
-    expect(planToDesign.content[0].text).toContain('Design: Draft (Ready for tasks)');
-    expect(planToDesign.content[0].text).toContain('Phase: Design Document');
+    expect(planToDesign.content[0].text).toContain('status: drafting');
+    expect(planToDesign.content[0].text).toContain('phase: design');
 
     // Design --> Tasks: sc_plan (resolve ambiguities & approve)
     // First call shows pending edits
@@ -77,8 +77,8 @@ describe('Workflow State Diagram Integration', () => {
     await tools['sc_approve'].callback({}, {});
     const planToTasks = await tools['sc_plan'].callback({}, {});
     expect(planToTasks.content[0].text).toContain(`Design complete. Scaffolding ${tskFile}.`);
-    expect(planToTasks.content[0].text).toContain('Tasks: Draft (Ready for dev)');
-    expect(planToTasks.content[0].text).toContain('Phase: Task List');
+    expect(planToTasks.content[0].text).toContain('status: drafting');
+    expect(planToTasks.content[0].text).toContain('phase: tasks');
 
     // Tasks --> Implementation: sc_todo_* (add dependencies, annotate tasks from design, & approve)
     // Simulate approval of tasks
@@ -90,8 +90,8 @@ describe('Workflow State Diagram Integration', () => {
 
     // Transition to Implementation phase
     const statusRes = await tools['sc_status'].callback({ feature: featureName }, {});
-    expect(statusRes.content[0].text).toContain('Phase: Implementation');
-    expect(statusRes.content[0].text).toContain('Tasks: Active');
+    expect(statusRes.content[0].text).toContain('phase: implementation');
+    expect(statusRes.content[0].text).toContain('status: active');
 
     // Implementation --> [*]: (start/complete) All tasks completed
     // Complete 1.1
@@ -112,9 +112,9 @@ describe('Workflow State Diagram Integration', () => {
     // Final check - in reality, "All tasks completed" might still show "Implementation" 
     // but we verify the status summary reflects the completion.
     const finalStatus = await tools['sc_status'].callback({ feature: featureName }, {});
-    expect(finalStatus.content[0].text).toContain('Tasks: Completed');
-    expect(finalStatus.content[0].text).toContain('Phase: Completed');
-    expect(finalStatus.content[0].text).toContain('Feature workflow is complete.');
+    expect(finalStatus.content[0].text).toContain('status: finished');
+    expect(finalStatus.content[0].text).toContain('phase: completed');
+    expect(finalStatus.content[0].text).toContain('Workflow complete.');
 
     const tasksContent = readFileSync(tasksPath, 'utf-8');
     expect(tasksContent).not.toContain('- [ ]');

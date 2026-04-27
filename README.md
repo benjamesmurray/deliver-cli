@@ -6,21 +6,34 @@
 
 [English](README.md) | [简体中文](README-zh.md)
 
-**Deliver CLI** is a streamlined, state-aware Model Context Protocol (MCP) server that transforms your AI agent into a spec-driven product engineer. It provides a robust, zero-shot workflow that guides AI to systematically move from **Requirements → Design → Tasks** with minimal token usage and maximum autonomy.
+**Deliver CLI** is a senior-grade, state-aware Model Context Protocol (MCP) server that transforms your AI agent into a spec-driven product engineer. Version 3.0 (Agent-Optimized) is redesigned for high-density, low-token communication.
 
-## Why Deliver CLI?
+## Why Deliver CLI v3?
 
-The traditional approach to AI coding often leads to scope creep and forgotten requirements. `deliver-cli` (often aliased as `spec`) fixes this by providing:
+The traditional approach to AI coding often leads to scope creep and forgotten requirements. `deliver-cli` (v3) is optimized for senior AI agents:
 
-*   **State-Aware Autopilot:** The tool knows exactly what stage the project is in. The AI doesn't have to track whether it's doing "Requirements" or "Design"—it just calls `spec sc_plan` and the tool handles the transition automatically.
-*   **Streamlined Workflow:** Moves directly from Requirements (PRD) to Technical Design and then Implementation Tasks. No mandatory ambiguity resolution loops or testing phases—just pure execution.
+*   **TOON Status Output (Context Efficiency):** `sc_status` now returns a compact, YAML-like format instead of verbose Markdown. This reduces token usage per turn by ~70%, keeping your context window lean.
+*   **State-Aware Autopilot:** The tool knows exactly what stage the project is in. The AI doesn't have to track whether it's doing "Requirements" or "Design"—it just calls `mcpx spec sc_plan` and the tool handles the transition automatically.
+*   **Zero-Overhead Execution:** Subprocesses have been eliminated; the MCP server invokes the CLI logic directly for maximum speed and reliable error handling.
+*   **Minimalist Syntax:** Feature names and project identifiers are now optional. The tool defaults to the last-used project, reducing payload size for every subsequent tool call.
 *   **One-Shot vs. Step-Through Modes:** Users can toggle between **Step-Through** (the default "Draft -> Approve -> Confirm" cycle) and **One-Shot** mode. In One-Shot mode, the AI progresses through all phases—including archiving the project—without stopping for human approval.
-*   **Lifecycle Directory Management:** Automatically organizes work into `projects/active/` and `projects/completed/`. Once a workflow is finalized (or manually archived), the tool moves the entire feature folder to the completed directory.
-*   **Persistent Task-Epoch Memory:** A "short-term memory" system (`.epoch-context.md`) that tracks active focus, pending intentions, and hypotheses via `spec sc_epoch`. This ensures that if an AI session is interrupted or closed, the next session resumes with perfect context.
-*   **Agent-Friendly "Soft" Signals:** The CLI output uses status-oriented language (e.g., `💡 Next Step`, `Draft (Ready for design)`) rather than coercive commands like `STRICT MANDATE`. This prevents AI "compliance stalling" and ensures agents stay focused on the "One-Shot" goal.
-*   **The "GPS Breadcrumb" System:** At the end of every tool call, `deliver-cli` outputs an explicit "Next Step" directive. For example, `sc_init` returns the absolute path to the newly created requirements file and immediately prompts for its content. This turns the tool into an autonomous GPS, heavily reducing the need for lengthy system prompts.
-*   **Explicit Approval Gates:** To prevent premature implementation, the workflow includes an explicit `spec sc_approve` step. After the AI completes a draft (Requirements, Design, or Tasks), it enters a **Reviewing** state. In Step-Through mode, the user must approve the document before the AI can proceed.
-*   **Lexer-Guided Reliability:** Uses a robust Markdown lexer (powered by `marked`) instead of fragile Regular Expressions to parse and surgically update documents. This ensures task checkboxes are updated accurately without corrupting other formatting.
+*   **Lifecycle Directory Management:** Automatically organizes work into `projects/active/` and `projects/completed/`.
+*   **Persistent Task-Epoch Memory:** A "short-term memory" system (`.epoch-context.md`) that tracks active focus, pending intentions, and hypotheses via `mcpx spec sc_epoch`.
+*   **The "GPS Breadcrumb" System:** At the end of every tool call, `deliver-cli` outputs an explicit "Next Step" directive.
+
+## TOON Format (New in v3)
+
+Instead of verbose Markdown, `mcpx spec sc_status` returns a compact block:
+
+```yaml
+spec_status:
+  feature: code-analytics
+  phase: requirements
+  status: drafting
+  next_step: write Requirements.md
+  blockers: [template_tags_present]
+  mode: one-shot
+```
 
 ## Workflow Diagram
 
@@ -76,20 +89,20 @@ Spec CLI provides a suite of surgical MCP tools to guide the AI agent through th
 
 | Tool Name | Purpose | Example Arguments |
 | :--- | :--- | :--- |
-| `spec sc_init` | Initialize a new feature specification in `projects/active/`. | `{"name": "auth-system", "mode": "one-shot"}` |
-| `spec sc_plan` | Progress the workflow state. Automatically archives when finished. | `{"instruction": "Use PostgreSQL"}` |
-| `spec sc_approve` | Explicitly approve the current drafted phase after review. | `{}` |
-| `spec sc_feedback` | Provide user feedback or answers to questions. | `{"feedback": "The logo should be blue"}` |
-| `spec sc_status` | Get a health check of the active project and snappy next steps. | `{"feature": "auth-system"}` |
-| `spec sc_todo_list` | List all implementation tasks and their status. | `{}` |
-| `spec sc_todo_start` | Mark a specific task as being actively worked on. | `{"id": "1.1"}` |
-| `spec sc_todo_complete` | Mark a specific task as completed. | `{"id": "1.1"}` |
-| `spec sc_epoch` | Update the task-epoch context for short-term memory. | `{"focus": "implement auth"}` |
-| `spec sc_mode` | Toggle project mode between `one-shot` and `step-through`. | `{"mode": "one-shot"}` |
-| `spec sc_archive` | Manually move the project to the `projects/completed/` folder. | `{}` |
-| `spec sc_help` | Learn how to use the tools and get deep documentation. | `{"topic": "sc_plan"}` |
-| `spec sc_verify` | A dedicated tool to validate that the last action worked. | `{}` |
-| `spec sc_refresh` | Force a refresh and synchronization of the internal workflow state machine. | `{}` |
+| `mcpx spec sc_init` | Initialize a new feature specification in `projects/active/`. | `{"name": "auth-system", "mode": "one-shot"}` |
+| `mcpx spec sc_plan` | Progress the workflow state. Automatically archives when finished. | `{"instruction": "Use PostgreSQL"}` |
+| `mcpx spec sc_approve` | Explicitly approve the current drafted phase after review. | `{}` |
+| `mcpx spec sc_feedback` | Provide user feedback or answers to questions. | `{"feedback": "The logo should be blue"}` |
+| `mcpx spec sc_status` | Get a health check of the active project and snappy next steps. | `{"feature": "auth-system"}` |
+| `mcpx spec sc_todo_list` | List all implementation tasks and their status. | `{}` |
+| `mcpx spec sc_todo_start` | Mark a specific task as being actively worked on. | `{"id": "1.1"}` |
+| `mcpx spec sc_todo_complete` | Mark a specific task as completed. | `{"id": "1.1"}` |
+| `mcpx spec sc_epoch` | Update the task-epoch context for short-term memory. | `{"focus": "implement auth"}` |
+| `mcpx spec sc_mode` | Toggle project mode between `one-shot` and `step-through`. | `{"mode": "one-shot"}` |
+| `mcpx spec sc_archive` | Manually move the project to the `projects/completed/` folder. | `{}` |
+| `mcpx spec sc_help` | Learn how to use the tools and get deep documentation. | `{"topic": "sc_plan"}` |
+| `mcpx spec sc_verify` | A dedicated tool to validate that the last action worked. | `{}` |
+| `mcpx spec sc_refresh` | Force a refresh and synchronization of the internal workflow state machine. | `{}` |
 
 ## Command Line Interface
 
@@ -97,17 +110,17 @@ While primarily used via MCP, Spec CLI also provides a powerful standalone inter
 
 | Command | Description |
 | :--- | :--- |
-| `spec sc_init --name <name>` | Initialize a new feature specification. |
-| `spec sc_plan` | Progress the workflow state. |
-| `spec sc_approve` | Explicitly approve the current phase. |
-| `spec sc_feedback --feedback <text>` | Provide user feedback or answers. |
-| `spec sc_todo_list` | List implementation tasks. |
-| `spec sc_epoch --focus <text>` | Update short-term memory context. |
-| `spec sc_mode <mode>` | Toggle between 'one-shot' and 'step-through'. |
-| `spec sc_archive` | Manually archive the project. |
-| `spec sc_status` | Get a health check of the active project. |
-| `spec sc_verify` | Verify current state and check consistency. |
-| `spec sc_help` | Show help documentation. |
+| `mcpx spec sc_init --name <name>` | Initialize a new feature specification. |
+| `mcpx spec sc_plan` | Progress the workflow state. |
+| `mcpx spec sc_approve` | Explicitly approve the current phase. |
+| `mcpx spec sc_feedback --feedback <text>` | Provide user feedback or answers. |
+| `mcpx spec sc_todo_list` | List implementation tasks. |
+| `mcpx spec sc_epoch --focus <text>` | Update short-term memory context. |
+| `mcpx spec sc_mode <mode>` | Toggle between 'one-shot' and 'step-through'. |
+| `mcpx spec sc_archive` | Manually archive the project. |
+| `mcpx spec sc_status` | Get a health check of the active project. |
+| `mcpx spec sc_verify` | Verify current state and check consistency. |
+| `mcpx spec sc_help` | Show help documentation. |
 
 ## Installation & Setup
 

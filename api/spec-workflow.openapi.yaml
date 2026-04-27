@@ -216,7 +216,7 @@ components:
             📁 Project root path: ${projectRoot}
             📝 Configuration file: ${configPath}
 
-            If user needs to reconfigure, model please ask user to delete the .specs directory first, then run spec sc_init again.
+            If user needs to reconfigure, model please ask user to delete the .specs directory first, then use mcpx spec sc_init again.
 
         - success: false
           data:
@@ -278,9 +278,9 @@ components:
             Model please continue with the following actions:
             1. Read the requirements-guide below
             2. First read ${path}/requirements.md, then start writing the document
-            3. After completing the document, use spec sc_status to check the document status
+            3. After completing the document, use mcpx spec sc_status to check the document status
             4. Once the requirements are complete, ask the user "Do the requirements look good?"
-            5. When the user approves, the model must use the spec sc_plan tool to enter the design phase
+            5. When the user approves, the model must use the mcpx spec sc_plan tool to enter the design phase
             
             Special case - Skip requirements phase:
             - Only consider skipping when user explicitly requests (e.g., "skip requirements document", "go directly to design")
@@ -330,14 +330,14 @@ components:
             📝 Created: requirements.md
             
             📊 Overall progress: ${progress}%
-            🔄 Current status: Writing requirements document (current) → Next step: 💡 Next Step: Read the template requirements.md file created to understand the layout, and then write the contents of the requirements.md file for this project, then run `spec sc_plan` to move through the workflow.
+            🔄 Current status: Writing requirements document (current) → Next step: 💡 Next Step: Read the template requirements.md file created to understand the layout, and then write the contents of the requirements.md file for this project, then run `mcpx spec sc_plan` to move through the workflow.
             
             Model please continue with the following actions:
             1. Read the requirements-guide below
             2. First read ${path}/requirements.md, then start writing the document
-            3. After completing the document, use spec sc_status to check the document status
+            3. After completing the document, use mcpx spec sc_status to check the document status
             4. Once the requirements are complete, ask the user "Do the requirements look good?"
-            5. When the user approves, the model must use the spec sc_plan tool to enter the design phase
+            5. When the user approves, the model must use the mcpx spec sc_plan tool to enter the design phase
             
             Special case - Skip requirements phase:
             - Only consider skipping when user explicitly requests (e.g., "skip requirements document", "go directly to design")
@@ -367,7 +367,7 @@ components:
             1. Check if there are any ambiguities or uncertainties to be addressed before proceeding. Address these yourself unless there is a type of uncertainty which needs guidance from the user.
             2. Once all ambiguities are resolved, ask the user "Do the requirements look good?"
             3. Wait for explicit user approval (e.g., "yes", "approved", "looks good", etc.)
-            4. After approval, use the spec sc_plan tool
+            4. After approval, use the mcpx spec sc_plan tool
             5. Enter the design phase
         
         - stage: design
@@ -391,9 +391,9 @@ components:
             Model please continue with the following actions:
             1. Read the document-guide below
             2. First read the file, then start writing
-            3. After completing the document, use spec sc_status to check the document status
+            3. After completing the document, use mcpx spec sc_status to check the document status
             4. Once complete, ask the user for approval
-            5. When the user approves, the model must use the spec sc_plan tool to progress
+            5. When the user approves, the model must use the mcpx spec sc_plan tool to progress
             
             Special case - Skip design phase:
             - Only consider skipping when user explicitly requests (e.g., "skip design document", "go directly to tasks")
@@ -427,7 +427,7 @@ components:
             2. Once all ambiguities are resolved, ask the user "Does the design look good?"
             3. Wait for explicit user approval (e.g., "yes", "approved", "looks good", etc.)
             4. Must not proceed to task writing until getting explicit approval
-            5. After approval, use the spec sc_plan tool
+            5. After approval, use the mcpx spec sc_plan tool
             6. Enter the tasks phase
             
         - stage: tasks
@@ -452,9 +452,9 @@ components:
             1. Read the task writing guide below
             2. First read ${path}/tasks.md, then start writing the document
             3. Once the tasks are documented, do a refresh of the tasks.md document by annotating the tasks with information from the design docs, adding details of the files that are likely to be edited or added (using the project map to see what those are), identifying dependencies, and structuring the tasks into a sensible order of execution.
-            4. After completing the refresh, use spec sc_status to check the document status
+            4. After completing the refresh, use mcpx spec sc_status to check the document status
             5. When check passes, the model must ask the user "Does the task plan look good?", and continue after getting explicit approval
-            6. When the user approves, the model must use the spec sc_plan tool to complete the workflow
+            6. When the user approves, the model must use the mcpx spec sc_plan tool to complete the workflow
 
             
         - stage: tasks
@@ -481,7 +481,7 @@ components:
             Model please continue with the following actions:
             1. Ask the user "Does the task plan look good?"
             2. Wait for explicit user approval (e.g., "yes", "approved", "looks good", etc.)
-            3. After approval, use the spec sc_plan tool
+            3. After approval, use the mcpx spec sc_plan tool
             4. Complete the entire workflow
             
         - stage: completed
@@ -584,7 +584,7 @@ components:
             - If user is not ready to develop now, user can skip temporarily
 
             To write the tasks document later:
-            1. Use spec sc_status to review current status
+            1. Use mcpx spec sc_status to review current status
             2. Edit the tasks.md document with implementation details
             3. Confirm when ready to start development
 
@@ -633,9 +633,9 @@ components:
             Model please continue with the following actions:
             1. Read the document-guide below
             2. First read the file, then start writing
-            3. After completing the document, use spec sc_status to check the document status
+            3. After completing the document, use mcpx spec sc_status to check the document status
             4. Once complete, ask the user for approval
-            5. When the user approves, the model must use the spec sc_plan tool to progress
+            5. When the user approves, the model must use the mcpx spec sc_plan tool to progress
             
             Special case - Skip design phase:
             - Only consider skipping when user explicitly requests (e.g., "skip design document", "go directly to tasks")
@@ -670,9 +670,9 @@ components:
             1. Read the task writing guide below
             2. First read ${path}/tasks.md, then start writing the document
             3. Once the tasks are documented, do a refresh of the tasks.md document by annotating the tasks with information from the design docs, adding details of the files that are likely to be edited or added (using the project map to see what those are), identifying dependencies, and structuring the tasks into a sensible order of execution.
-            4. After completing the refresh, use spec sc_status to check the document status
+            4. After completing the refresh, use mcpx spec sc_status to check the document status
             5. When check passes, the model must ask the user "Does the task plan look good?", and continue after getting explicit approval
-            6. When the user approves, the model must use the spec sc_plan tool to complete the workflow
+            6. When the user approves, the model must use the mcpx spec sc_plan tool to complete the workflow
 
             
         - stage: tasks
@@ -798,7 +798,7 @@ components:
             ⚠️ IMPORTANT INSTRUCTIONS FOR MODEL:
             1. [TASK FOCUS] Model MUST follow the workflow instructions to complete the specified task, not plan tasks independently.
 
-            2. [PROGRESS TRACKING] After completing each subtask, model MUST use the spec sc_todo_complete tool to mark it complete. DO NOT edit task.md directly.
+            2. [PROGRESS TRACKING] After completing each subtask, model MUST use the mcpx spec sc_todo_complete tool to mark it complete. DO NOT edit task.md directly.
             3. [WORKFLOW] Implement task → Call complete_task to mark complete → Get next task automatically → Continue implementation
 
             Model: Please confirm your preferred execution mode:
@@ -807,7 +807,7 @@ components:
 
             **Automatic Mode**: The model will complete tasks sequentially until all tasks are finished without requiring confirmation for each step.
 
-            After you confirm your preferred approach, I will execute the development work for ${firstSubtask} according to your chosen mode, and immediately use spec sc_todo_complete to proceed to the next one.
+            After you confirm your preferred approach, I will execute the development work for ${firstSubtask} according to your chosen mode, and immediately use mcpx spec sc_todo_complete to proceed to the next one.
         - success: false
           completedTasks: []
           alreadyCompleted: []
@@ -938,7 +938,7 @@ x-error-responses:
       Model: Please ask user to choose one of the following actions:
       1. Delete existing files and reinitialize: rm -rf ${path}/*
       2. Initialize in a new directory: use a different path parameter
-      3. Continue editing existing project: use spec sc_status to check project status and read existing documents to see if adjustments are needed
+      3. Continue editing existing project: use mcpx spec sc_status to check project status and read existing documents to see if adjustments are needed
   
   missingParameters:
     displayText: |
@@ -956,7 +956,7 @@ x-error-responses:
       📄 ${documentName} still contains template markers and has not been edited.
       
       The document appears to be in its initial state with placeholder content.
-      Before confirming, you must edit the document and then use spec sc_status to verify the document is ready.
+      Before confirming, you must edit the document and then use mcpx spec sc_status to verify the document is ready.
       
       If you want to skip writing this document:
       - Only proceed after user explicitly confirms
@@ -981,7 +981,7 @@ x-error-responses:
 
       Before using other features, model please complete project initialization first:
 
-      **Step 1: Call spec sc_init**
+      **Step 1: Call mcpx spec sc_init**
       ```json
       {
         "name": "${name}"
@@ -1022,7 +1022,7 @@ x-shared-resources:
     text: |
       ⚠️ Important: Model please delete all content with <template-*> tags, then start writing formal content.
       These tags are used to detect whether the document has been edited. Keeping these tags will cause the document to be judged as "not edited" status.
-      To verify your actions have persisted and to refresh the state, use `spec sc_refresh`. **NEVER** use `spec sc_init` to refresh the state, as it will reset the workflow.
+      To verify your actions have persisted and to refresh the state, use `mcpx spec sc_refresh`. **NEVER** use `mcpx spec sc_init` to refresh the state, as it will reset the workflow.
   
   # Requirements document example (reuses existing requirements-guide)
   requirements-template-example:
@@ -1114,7 +1114,7 @@ x-shared-resources:
         - Once ready, ask for explicit approval.
       - **Mode-Specific Progression:**
         - **In STEP-THROUGH mode:** Only once all ambiguities are resolved, ask for final, explicit approval.
-        - **In ONE-SHOT mode:** Once all ambiguities are resolved autonomously, IMMEDIATELY run `spec sc_plan` to scaffold the design phase.
+        - **In ONE-SHOT mode:** Once all ambiguities are resolved autonomously, IMMEDIATELY run `mcpx spec sc_plan` to scaffold the design phase.
       - The model MUST make modifications to the requirements document if the user requests changes or does not explicitly approve
       - The model MUST NOT call sc_plan to transition to the design phase until receiving clear approval (such as "yes", "approved", "looks good", etc.)
       - The model MUST continue the feedback-revision cycle until explicit approval is received
@@ -1161,7 +1161,7 @@ x-shared-resources:
         - Once ready, ask for explicit approval.
       - **Mode-Specific Progression:**
         - **In STEP-THROUGH mode:** Only once all ambiguities are resolved, ask for final, explicit approval.
-        - **In ONE-SHOT mode:** Once all ambiguities are resolved autonomously, IMMEDIATELY run `spec sc_plan` to scaffold the tasks phase.
+        - **In ONE-SHOT mode:** Once all ambiguities are resolved autonomously, IMMEDIATELY run `mcpx spec sc_plan` to scaffold the tasks phase.
       - The model MUST make modifications to the design document if the user requests changes or does not explicitly approve
       - The model MUST NOT call sc_plan to transition to the implementation plan until receiving clear approval (such as "yes", "approved", "looks good", etc.)
       - The model MUST continue the feedback-revision cycle until explicit approval is received
@@ -1235,7 +1235,7 @@ x-shared-resources:
         - Once ready, ask for explicit approval.
       - **Mode-Specific Progression:**
         - **In STEP-THROUGH mode:** Only once all ambiguities are resolved, ask for final, explicit approval. After approval, stop and wait for the user to start the first task.
-        - **In ONE-SHOT mode:** Once the task plan is complete and all ambiguities are resolved autonomously, IMMEDIATELY run `spec sc_todo_start --id <first_task_id>` to begin implementation.
+        - **In ONE-SHOT mode:** Once the task plan is complete and all ambiguities are resolved autonomously, IMMEDIATELY run `mcpx spec sc_todo_start --id <first_task_id>` to begin implementation.
       - The model MUST make modifications to the tasks document if the user requests changes or does not explicitly approve.
       - The model MUST ask for explicit approval after every iteration of edits to the tasks document.
       - The model MUST NOT call sc_plan to complete the workflow until receiving clear approval (such as "yes", "approved", "looks good", etc.).
@@ -1339,13 +1339,13 @@ x-task-guidance-template:
   instructions:
     prefix: "⚠️ IMPORTANT INSTRUCTIONS FOR MODEL:"
     taskFocus: "1. [TASK FOCUS] Model MUST follow the workflow instructions to complete the specified task, not plan tasks independently."
-    progressTracking: "2. [PROGRESS TRACKING] After completing each subtask, model MUST use spec sc_todo_complete to mark it complete. DO NOT edit task.md directly."
+    progressTracking: "2. [PROGRESS TRACKING] After completing each subtask, model MUST use mcpx spec sc_todo_complete to mark it complete. DO NOT edit task.md directly."
     workflow: "3. [WORKFLOW] Implement task → Call sc_todo_complete to mark complete → Get next task automatically → Continue implementation"
   prompts:
-    firstTask: "Model: Please ask user \"Would you prefer to complete tasks one by one and report progress for your confirmation, or complete tasks sequentially and mark them as done until all tasks are finished at once?\" After user confirms, execute the development work for ${firstSubtask} according to user's preferred approach, and immediately use spec sc_todo_complete after completing this specified task."
-    nextTask: "Model: Please execute the development work for ${firstSubtask} and immediately use spec sc_todo_complete after completing this specified task."
-    continueTask: "Model: Please execute the development work for ${firstSubtask} and immediately use spec sc_todo_complete after completing this specified task."
-    batchContinue: "Model: Please execute the development work for ${firstSubtask} and immediately use spec sc_todo_complete after completing this specified task."
+    firstTask: "Model: Please ask user \"Would you prefer to complete tasks one by one and report progress for your confirmation, or complete tasks sequentially and mark them as done until all tasks are finished at once?\" After user confirms, execute the development work for ${firstSubtask} according to user's preferred approach, and immediately use mcpx spec sc_todo_complete after completing this specified task."
+    nextTask: "Model: Please execute the development work for ${firstSubtask} and immediately use mcpx spec sc_todo_complete after completing this specified task."
+    continueTask: "Model: Please execute the development work for ${firstSubtask} and immediately use mcpx spec sc_todo_complete after completing this specified task."
+    batchContinue: "Model: Please execute the development work for ${firstSubtask} and immediately use mcpx spec sc_todo_complete after completing this specified task."
   completionMessages:
     taskCompleted: "✅ Task ${taskNumber} marked as completed!"
     allCompleted: "🎉 Congratulations! All tasks completed!\n\nYou have successfully completed all implementation tasks. Project implementation phase completed."

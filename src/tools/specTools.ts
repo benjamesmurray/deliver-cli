@@ -1,34 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { execFile } from 'child_process';
-import { promisify } from 'util';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const execFileAsync = promisify(execFile);
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const isTs = __filename.endsWith('.ts');
-const cliCmd = isTs ? 'npx' : 'node';
-const cliPath = join(__dirname, '..', isTs ? 'cli.ts' : 'cli.js');
-
-async function runCli(args: string[]): Promise<string> {
-  try {
-    const execArgs = isTs ? ['tsx', cliPath, ...args] : [cliPath, ...args];
-    const { stdout, stderr } = await execFileAsync(cliCmd, execArgs, {
-        cwd: process.cwd(),
-        env: process.env
-    });
-    if (stderr && stderr.trim().length > 0 && !stdout) {
-       throw new Error(stderr);
-    }
-    return stdout.trim();
-  } catch (error: any) {
-    if (error.stdout) return error.stdout.trim();
-    throw new Error(error.message || String(error));
-  }
-}
+import { executeCliCommand } from '../cli.js';
 
 export function registerSpecTools(server: McpServer): void {
   server.registerTool(
@@ -43,7 +15,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['status'];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -56,17 +28,18 @@ export function registerSpecTools(server: McpServer): void {
     {
       description: 'Initialize a new feature specification. MUST be called from the workspace root directory. Do not cd into subdirectories first.',
       inputSchema: {
-        name: z.string().describe('Feature name'),
+        name: z.string().optional().describe('Feature name (optional)'),
         description: z.string().optional().describe('Optional feature description'),
         mode: z.enum(['one-shot', 'step-through']).optional().describe('Workflow mode (default: step-through)')
       }
     },
     async (args) => {
       try {
-        const cliArgs = ['exec', 'init', '--name', args.name];
+        const cliArgs = ['exec', 'init'];
+        if (args.name) cliArgs.push('--name', args.name);
         if (args.description) cliArgs.push('--description', args.description);
         if (args.mode) cliArgs.push('--mode', args.mode);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -88,7 +61,7 @@ export function registerSpecTools(server: McpServer): void {
         const cliArgs = ['exec', 'plan'];
         if (args.feature) cliArgs.push('--feature', args.feature);
         if (args.instruction) cliArgs.push('--instruction', args.instruction);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -108,7 +81,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['exec', 'todo', 'list'];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -129,7 +102,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['exec', 'todo', 'start', '--id', args.id];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -150,7 +123,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['exec', 'todo', 'complete', '--id', args.id];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -178,7 +151,7 @@ export function registerSpecTools(server: McpServer): void {
         if (args.intentions) cliArgs.push('--intentions', args.intentions);
         if (args.hypotheses) cliArgs.push('--hypotheses', args.hypotheses);
         if (args.openQuestions) cliArgs.push('--openQuestions', args.openQuestions);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -198,7 +171,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['exec', 'approve'];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -218,7 +191,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['exec', 'archive'];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -239,7 +212,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['exec', 'feedback', '--instruction', args.feedback];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -260,7 +233,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['exec', 'mode', args.mode];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -280,7 +253,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['help'];
         if (args.topic) cliArgs.push(args.topic);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -300,7 +273,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['verify'];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
@@ -320,7 +293,7 @@ export function registerSpecTools(server: McpServer): void {
       try {
         const cliArgs = ['verify'];
         if (args.feature) cliArgs.push('--feature', args.feature);
-        const result = await runCli(cliArgs);
+        const result = await executeCliCommand(cliArgs);
         return { content: [{ type: 'text', text: result }] };
       } catch (error: any) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };

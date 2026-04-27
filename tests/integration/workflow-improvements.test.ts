@@ -44,8 +44,8 @@ describe('Workflow Improvements Integration', () => {
       const output = archiveRes.content[0].text;
       
       expect(output).toContain('Successfully archived project');
-      expect(output).toContain('Phase: Completed');
-      expect(output).toContain('Next Step: Feature workflow is complete. This project is archived.');
+      expect(output).toContain('phase: completed');
+      expect(output).toContain('next_step: Feature workflow complete.');
       expect(output).not.toContain('STRICT MANDATE: You are in the Planning Phase');
       expect(output).not.toContain('Run `sc_init` to initialize requirements');
     });
@@ -101,7 +101,7 @@ describe('Workflow Improvements Integration', () => {
 
       // Now approve should work
       const approveResSuccess = await tools['sc_approve'].callback({ feature: featureName }, {});
-      expect(approveResSuccess.content[0].text).toContain('Requirements Document" has been approved');
+      expect(approveResSuccess.content[0].text).toContain('Requirements Document" approved');
       }, 10000); // 10s timeout for the delay
 
       describe('One-shot Mode Design', () => {

@@ -59,7 +59,7 @@ describe('Epoch Context Integration', () => {
 
     // 3. Status should show epoch context
     const statusRes = await tools['sc_status'].callback({ feature: featureName }, {});
-    expect(statusRes.content[0].text).toContain('--- Epoch Context ---');
+    expect(statusRes.content[0].text).toContain('epoch_context:');
     expect(statusRes.content[0].text).toContain('Initial research');
 
     // 4. Surgical update - change focus only

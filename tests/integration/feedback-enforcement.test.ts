@@ -55,7 +55,7 @@ describe('Feedback Enforcement Integration', () => {
 
     // Now approve should work
     const approveRes2 = await tools['sc_approve'].callback({ feature: featureName }, {});
-    expect(approveRes2.content[0].text).toContain('Requirements Document" has been approved');
+    expect(approveRes2.content[0].text).toContain('Requirements Document" approved');
   });
 
   it('should enforce no open questions in one-shot mode sc_plan', async () => {
@@ -103,6 +103,6 @@ describe('Feedback Enforcement Integration', () => {
 
     // Now approve should work
     const approveRes2 = await tools['sc_approve'].callback({ feature: featureName }, {});
-    expect(approveRes2.content[0].text).toContain('Requirements Document" has been approved');
+    expect(approveRes2.content[0].text).toContain('Requirements Document" approved');
   }, 10000);
 });

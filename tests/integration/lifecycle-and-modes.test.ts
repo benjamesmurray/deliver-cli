@@ -43,7 +43,7 @@ describe('Lifecycle and Modes Integration', () => {
 
     // 2. Check status (should show one-shot instructions)
     const statusRes1 = await tools['sc_status'].callback({ feature: featureName }, {});
-    expect(statusRes1.content[0].text).toContain('🤖 [AUTONOMOUS REVIEW] Resolve ambiguities autonomously. Once resolved, run `spec sc_plan` to scaffold the design phase.');
+    expect(statusRes1.content[0].text).toContain('next_step: Resolve ambiguities then use mcpx spec sc_plan.');
 
     // 3. Toggle back to step-through
     await tools['sc_mode'].callback({ mode: 'step-through', feature: featureName }, {});
@@ -51,7 +51,7 @@ describe('Lifecycle and Modes Integration', () => {
     // 4. Check status (should show normal loop instructions)
     const statusRes2 = await tools['sc_status'].callback({ feature: featureName }, {});
     expect(statusRes2.content[0].text).not.toContain('🤖 [AUTONOMOUS REVIEW]');
-    expect(statusRes2.content[0].text).toContain('🔍 [REVIEW]');
+    expect(statusRes2.content[0].text).toContain('status: reviewing');
   });
 
   it('should automatically archive the project when the workflow is finished', async () => {
