@@ -102,7 +102,7 @@ describe('SpecManager', () => {
       
       expect(summary).toContain('spec_status:');
       expect(summary).toContain('phase: requirements');
-      expect(summary).toContain('next_step: use mcpx spec sc_init to initialize requirements.');
+      expect(summary).toContain('next_step: use mcpx with server="spec" and tool="sc_init" to initialize requirements.');
     });
 
     it('should return draft status and blocker if document contains <template-*> tags', () => {
@@ -116,7 +116,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('status: drafting');
       expect(summary).toContain('blockers: [template_tags_present]');
-      expect(summary).toContain('next_step: Write requirements.md and use mcpx spec sc_plan to advance.');
+      expect(summary).toContain('next_step: Write requirements.md and use mcpx with server="spec" and tool="sc_plan" to advance.');
     });
 
     it('should return reviewing if document exists and has no <template-*> tags', () => {
@@ -130,7 +130,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('status: reviewing');
       expect(summary).toContain('phase: requirements');
-      expect(summary).toContain('next_step: Review and use mcpx spec sc_approve.');
+      expect(summary).toContain('next_step: Review and use mcpx with server="spec" and tool="sc_approve".');
     });
 
     it('should return one-shot specific instructions when mode is one-shot', () => {
@@ -145,7 +145,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('status: reviewing');
       expect(summary).toContain('mode: one-shot');
-      expect(summary).toContain('next_step: Resolve ambiguities then use mcpx spec sc_plan.');
+      expect(summary).toContain('next_step: Resolve ambiguities then use mcpx with server="spec" and tool="sc_plan".');
     });
     
     it('should handle full workflow Reviewing state', () => {
@@ -175,7 +175,7 @@ describe('SpecManager', () => {
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('phase: design');
       expect(summary).toContain('status: drafting');
-      expect(summary).toContain('next_step: Write design.md and use mcpx spec sc_plan to advance.');
+      expect(summary).toContain('next_step: Write design.md and use mcpx with server="spec" and tool="sc_plan" to advance.');
     });
 
     it('should return approved state when approval marker exists', () => {
@@ -189,7 +189,7 @@ describe('SpecManager', () => {
       
       const summary = SpecManager.getStatusSummary(tempDir, featureName);
       expect(summary).toContain('status: approved');
-      expect(summary).toContain('next_step: use mcpx spec sc_plan to scaffold design.');
+      expect(summary).toContain('next_step: use mcpx with server="spec" and tool="sc_plan" to scaffold design.');
     });
 
     it('should include epoch context in status summary if file exists', () => {

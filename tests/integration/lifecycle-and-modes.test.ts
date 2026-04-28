@@ -43,7 +43,7 @@ describe('Lifecycle and Modes Integration', () => {
 
     // 2. Check status (should show one-shot instructions)
     const statusRes1 = await tools['sc_status'].callback({ feature: featureName }, {});
-    expect(statusRes1.content[0].text).toContain('next_step: Resolve ambiguities then use mcpx spec sc_plan.');
+    expect(statusRes1.content[0].text).toContain('next_step: Resolve ambiguities then use mcpx with server="spec" and tool="sc_plan".');
 
     // 3. Toggle back to step-through
     await tools['sc_mode'].callback({ mode: 'step-through', feature: featureName }, {});

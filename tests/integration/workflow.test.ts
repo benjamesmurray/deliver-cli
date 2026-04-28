@@ -44,7 +44,7 @@ describe('Spec CLI Workflow Integration', () => {
     // 1. Initialize
     const initRes = await tools['sc_init'].callback({ name: featureName, description: 'Add payments' }, {});
     expect(initRes.content[0].text).toContain('status: drafting');
-    expect(initRes.content[0].text).toContain('next_step: Write requirements.md and use mcpx spec sc_plan to advance.');
+    expect(initRes.content[0].text).toContain('next_step: Write requirements.md and use mcpx with server="spec" and tool="sc_plan" to advance.');
 
     // 2. plan (with requirements not finished)
     const planRes1 = await tools['sc_plan'].callback({ instruction: 'Use Stripe' }, {});
@@ -88,7 +88,7 @@ describe('Spec CLI Workflow Integration', () => {
     // 8. sc_status (everything ready)
     const statusRes = await tools['sc_status'].callback({}, {});
     expect(statusRes.content[0].text).toContain('status: active');
-    expect(statusRes.content[0].text).toContain('next_step: Proceed with tasks using mcpx spec sc_todo_start.');
+    expect(statusRes.content[0].text).toContain('next_step: Proceed with tasks using mcpx with server="spec" and tool="sc_todo_start".');
 
     // 9. todo (Complete a task)
     const todoRes = await tools['sc_todo_complete'].callback({ feature: featureName, id: '1.1' }, {});

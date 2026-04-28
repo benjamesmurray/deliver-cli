@@ -13,17 +13,17 @@
 The traditional approach to AI coding often leads to scope creep and forgotten requirements. `deliver-cli` (v3) is optimized for senior AI agents:
 
 *   **TOON Status Output (Context Efficiency):** `sc_status` now returns a compact, YAML-like format instead of verbose Markdown. This reduces token usage per turn by ~70%, keeping your context window lean.
-*   **State-Aware Autopilot:** The tool knows exactly what stage the project is in. The AI doesn't have to track whether it's doing "Requirements" or "Design"—it just calls `mcpx spec sc_plan` and the tool handles the transition automatically.
+*   **State-Aware Autopilot:** The tool knows exactly what stage the project is in. The AI doesn't have to track whether it's doing "Requirements" or "Design"—it just calls `mcpx with server="spec" tool="sc_plan" and instruction="Use PostgreSQL"` and the tool handles the transition automatically.
 *   **Zero-Overhead Execution:** Subprocesses have been eliminated; the MCP server invokes the CLI logic directly for maximum speed and reliable error handling.
 *   **Minimalist Syntax:** Feature names and project identifiers are now optional. The tool defaults to the last-used project, reducing payload size for every subsequent tool call.
 *   **One-Shot vs. Step-Through Modes:** Users can toggle between **Step-Through** (the default "Draft -> Approve -> Confirm" cycle) and **One-Shot** mode. In One-Shot mode, the AI progresses through all phases—including archiving the project—without stopping for human approval.
 *   **Lifecycle Directory Management:** Automatically organizes work into `projects/active/` and `projects/completed/`.
-*   **Persistent Task-Epoch Memory:** A "short-term memory" system (`.epoch-context.md`) that tracks active focus, pending intentions, and hypotheses via `mcpx spec sc_epoch`.
+*   **Persistent Task-Epoch Memory:** A "short-term memory" system (`.epoch-context.md`) that tracks active focus, pending intentions, and hypotheses via `mcpx with server="spec" tool="sc_epoch" and focus="implement auth"`.
 *   **The "GPS Breadcrumb" System:** At the end of every tool call, `deliver-cli` outputs an explicit "Next Step" directive.
 
 ## TOON Format (New in v3)
 
-Instead of verbose Markdown, `mcpx spec sc_status` returns a compact block:
+Instead of verbose Markdown, `mcpx with server="spec" and tool="sc_status"` returns a compact block:
 
 ```yaml
 spec_status:
@@ -89,20 +89,20 @@ Spec CLI provides a suite of surgical MCP tools to guide the AI agent through th
 
 | Tool Name | Purpose | Example Arguments |
 | :--- | :--- | :--- |
-| `mcpx spec sc_init` | Initialize a new feature specification in `projects/active/`. | `{"name": "auth-system", "mode": "one-shot"}` |
-| `mcpx spec sc_plan` | Progress the workflow state. Automatically archives when finished. | `{"instruction": "Use PostgreSQL"}` |
-| `mcpx spec sc_approve` | Explicitly approve the current drafted phase after review. | `{}` |
-| `mcpx spec sc_feedback` | Provide user feedback or answers to questions. | `{"feedback": "The logo should be blue"}` |
-| `mcpx spec sc_status` | Get a health check of the active project and snappy next steps. | `{"feature": "auth-system"}` |
-| `mcpx spec sc_todo_list` | List all implementation tasks and their status. | `{}` |
-| `mcpx spec sc_todo_start` | Mark a specific task as being actively worked on. | `{"id": "1.1"}` |
-| `mcpx spec sc_todo_complete` | Mark a specific task as completed. | `{"id": "1.1"}` |
-| `mcpx spec sc_epoch` | Update the task-epoch context for short-term memory. | `{"focus": "implement auth"}` |
-| `mcpx spec sc_mode` | Toggle project mode between `one-shot` and `step-through`. | `{"mode": "one-shot"}` |
-| `mcpx spec sc_archive` | Manually move the project to the `projects/completed/` folder. | `{}` |
-| `mcpx spec sc_help` | Learn how to use the tools and get deep documentation. | `{"topic": "sc_plan"}` |
-| `mcpx spec sc_verify` | A dedicated tool to validate that the last action worked. | `{}` |
-| `mcpx spec sc_refresh` | Force a refresh and synchronization of the internal workflow state machine. | `{}` |
+| `mcpx with server="spec" tool="sc_init" and name="auth-system"` | Initialize a new feature specification in `projects/active/`. | `{"name": "auth-system", "mode": "one-shot"}` |
+| `mcpx with server="spec" tool="sc_plan" and instruction="Use PostgreSQL"` | Progress the workflow state. Automatically archives when finished. | `{"instruction": "Use PostgreSQL"}` |
+| `mcpx with server="spec" and tool="sc_approve"` | Explicitly approve the current drafted phase after review. | `{}` |
+| `mcpx with server="spec" tool="sc_feedback" and feedback="..."` | Provide user feedback or answers to questions. | `{"feedback": "The logo should be blue"}` |
+| `mcpx with server="spec" tool="sc_status" and feature="auth-system"` | Get a health check of the active project and snappy next steps. | `{"feature": "auth-system"}` |
+| `mcpx with server="spec" and tool="sc_todo_list"` | List all implementation tasks and their status. | `{}` |
+| `mcpx with server="spec" tool="sc_todo_start" and id="1.1"` | Mark a specific task as being actively worked on. | `{"id": "1.1"}` |
+| `mcpx with server="spec" tool="sc_todo_complete" and id="1.1"` | Mark a specific task as completed. | `{"id": "1.1"}` |
+| `mcpx with server="spec" tool="sc_epoch" and focus="implement auth"` | Update the task-epoch context for short-term memory. | `{"focus": "implement auth"}` |
+| `mcpx with server="spec" tool="sc_mode" and mode="one-shot"` | Toggle project mode between `one-shot` and `step-through`. | `{"mode": "one-shot"}` |
+| `mcpx with server="spec" and tool="sc_archive"` | Manually move the project to the `projects/completed/` folder. | `{}` |
+| `mcpx with server="spec" tool="sc_help" and topic="sc_plan"` | Learn how to use the tools and get deep documentation. | `{"topic": "sc_plan"}` |
+| `mcpx with server="spec" and tool="sc_verify"` | A dedicated tool to validate that the last action worked. | `{}` |
+| `mcpx with server="spec" and tool="sc_refresh"` | Force a refresh and synchronization of the internal workflow state machine. | `{}` |
 
 ## Command Line Interface
 
@@ -110,17 +110,17 @@ While primarily used via MCP, Spec CLI also provides a powerful standalone inter
 
 | Command | Description |
 | :--- | :--- |
-| `mcpx spec sc_init --name <name>` | Initialize a new feature specification. |
-| `mcpx spec sc_plan` | Progress the workflow state. |
-| `mcpx spec sc_approve` | Explicitly approve the current phase. |
-| `mcpx spec sc_feedback --feedback <text>` | Provide user feedback or answers. |
-| `mcpx spec sc_todo_list` | List implementation tasks. |
-| `mcpx spec sc_epoch --focus <text>` | Update short-term memory context. |
-| `mcpx spec sc_mode <mode>` | Toggle between 'one-shot' and 'step-through'. |
-| `mcpx spec sc_archive` | Manually archive the project. |
-| `mcpx spec sc_status` | Get a health check of the active project. |
-| `mcpx spec sc_verify` | Verify current state and check consistency. |
-| `mcpx spec sc_help` | Show help documentation. |
+| `mcpx with server="spec" tool="sc_init" and name="<name>"` | Initialize a new feature specification. |
+| `mcpx with server="spec" tool="sc_plan" and instruction="Use PostgreSQL"` | Progress the workflow state. |
+| `mcpx with server="spec" and tool="sc_approve"` | Explicitly approve the current phase. |
+| `mcpx with server="spec" tool="sc_feedback" and feedback="<text>"` | Provide user feedback or answers. |
+| `mcpx with server="spec" and tool="sc_todo_list"` | List implementation tasks. |
+| `mcpx with server="spec" tool="sc_epoch" and focus="<text>"` | Update short-term memory context. |
+| `mcpx with server="spec" tool="sc_mode" and mode="<mode>"` | Toggle between 'one-shot' and 'step-through'. |
+| `mcpx with server="spec" and tool="sc_archive"` | Manually archive the project. |
+| `mcpx with server="spec" tool="sc_status" and feature="auth-system"` | Get a health check of the active project. |
+| `mcpx with server="spec" and tool="sc_verify"` | Verify current state and check consistency. |
+| `mcpx with server="spec" tool="sc_help" and topic="sc_plan"` | Show help documentation. |
 
 ## Installation & Setup
 

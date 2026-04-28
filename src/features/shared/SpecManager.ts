@@ -182,58 +182,58 @@ export class SpecManager {
           nextSteps = 'Feature workflow complete.';
       } else if (!state.requirements.exists) {
          phase = 'requirements';
-         nextSteps = 'use mcpx spec sc_init to initialize requirements.';
+         nextSteps = 'use mcpx with server="spec" and tool="sc_init" to initialize requirements.';
       } else if (!state.requirements.edited) {
          phase = 'requirements';
          status = 'drafting';
          blockers.push('template_tags_present');
-         nextSteps = 'Write requirements.md and use mcpx spec sc_plan to advance.';
+         nextSteps = 'Write requirements.md and use mcpx with server="spec" and tool="sc_plan" to advance.';
       } else if (!state.requirements.approved) {
          phase = 'requirements';
          status = 'reviewing';
          if (mode === 'one-shot') {
-            nextSteps = 'Resolve ambiguities then use mcpx spec sc_plan.';
+            nextSteps = 'Resolve ambiguities then use mcpx with server="spec" and tool="sc_plan".';
          } else {
-            nextSteps = 'Review and use mcpx spec sc_approve.';
+            nextSteps = 'Review and use mcpx with server="spec" and tool="sc_approve".';
          }
       } else if (!state.design.exists) {
          phase = 'requirements';
          status = 'approved';
-         nextSteps = 'use mcpx spec sc_plan to scaffold design.';
+         nextSteps = 'use mcpx with server="spec" and tool="sc_plan" to scaffold design.';
       } else if (!state.design.edited) {
          phase = 'design';
          status = 'drafting';
          blockers.push('template_tags_present');
-         nextSteps = 'Write design.md and use mcpx spec sc_plan to advance.';
+         nextSteps = 'Write design.md and use mcpx with server="spec" and tool="sc_plan" to advance.';
       } else if (!state.design.approved) {
          phase = 'design';
          status = 'reviewing';
          if (mode === 'one-shot') {
-            nextSteps = 'Resolve ambiguities then use mcpx spec sc_plan.';
+            nextSteps = 'Resolve ambiguities then use mcpx with server="spec" and tool="sc_plan".';
          } else {
-            nextSteps = 'Review and use mcpx spec sc_approve.';
+            nextSteps = 'Review and use mcpx with server="spec" and tool="sc_approve".';
          }
       } else if (!state.tasks.exists) {
          phase = 'design';
          status = 'approved';
-         nextSteps = 'use mcpx spec sc_plan to scaffold tasks.';
+         nextSteps = 'use mcpx with server="spec" and tool="sc_plan" to scaffold tasks.';
       } else if (!state.tasks.edited) {
          phase = 'tasks';
          status = 'drafting';
          blockers.push('template_tags_present');
-         nextSteps = 'Write tasks.md and use mcpx spec sc_todo_start to begin.';
+         nextSteps = 'Write tasks.md and use mcpx with server="spec" and tool="sc_todo_start" to begin.';
       } else if (!state.tasks.approved) {
          phase = 'tasks';
          status = 'reviewing';
          if (mode === 'one-shot') {
-            nextSteps = 'Resolve ambiguities then use mcpx spec sc_todo_start.';
+            nextSteps = 'Resolve ambiguities then use mcpx with server="spec" and tool="sc_todo_start".';
          } else {
-            nextSteps = 'Review and use mcpx spec sc_approve.';
+            nextSteps = 'Review and use mcpx with server="spec" and tool="sc_approve".';
          }
       } else if (!allTasksComplete) {
          phase = 'implementation';
          status = 'active';
-         nextSteps = 'Proceed with tasks using mcpx spec sc_todo_start.';
+         nextSteps = 'Proceed with tasks using mcpx with server="spec" and tool="sc_todo_start".';
       } else {
          phase = 'completed';
          status = 'finished';
@@ -258,7 +258,7 @@ export class SpecManager {
       return `spec_status:
   phase: error
   error: ${e.message}
-  next_step: use mcpx spec sc_init --name "your-feature"`;
+  next_step: use mcpx with server="spec" tool="sc_init" and name="your-feature"`;
     }
   }
 
@@ -280,7 +280,7 @@ export class SpecManager {
                      return t.length > 0 && t.toLowerCase() !== 'none' && t !== '*';
                  });
                  if (hasRealQuestions) {
-                     throw new Error(`Cannot advance while there are active open questions in the epoch context. Please resolve them using \`use mcpx spec sc_epoch --openQuestions "None"\`.`);
+                     throw new Error(`Cannot advance while there are active open questions in the epoch context. Please resolve them using \`use mcpx with server="spec" tool="sc_epoch" and openQuestions="None"\`.`);
                  }
             }
         }
@@ -310,13 +310,13 @@ export class SpecManager {
         const markerTime = new Date(readFileSync(feedbackMarker, 'utf-8')).getTime();
         const now = Date.now();
         if (now - markerTime < 2000) { // 2 seconds threshold
-            throw new Error('Approval blocked: Recent feedback was recorded. To prevent misinterpretation of information as approval, you must wait for a separate turn and explicit user approval before calling mcpx spec sc_approve.');
+            throw new Error('Approval blocked: Recent feedback was recorded. To prevent misinterpretation of information as approval, you must wait for a separate turn and explicit user approval before calling mcpx with server="spec" and tool="sc_approve".');
         }
         rmSync(feedbackMarker, { force: true });
     }
 
     const approvedPath = join(featurePath, `.spec-${phase}-approved`);
     writeFileSync(approvedPath, new Date().toISOString(), 'utf-8');
-    return `✅ Phase "${WorkflowStateRepository.getStageDisplayName(phase)}" approved. use mcpx spec sc_plan to scaffold next phase.`;
+    return `✅ Phase "${WorkflowStateRepository.getStageDisplayName(phase)}" approved. use mcpx with server="spec" and tool="sc_plan" to scaffold next phase.`;
   }
 }

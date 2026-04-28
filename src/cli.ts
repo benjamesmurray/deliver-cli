@@ -86,12 +86,12 @@ export async function executeCliCommand(args: string[]): Promise<string> {
 Initialize a new feature specification.
 
 Usage:
-  mcpx spec sc_init --name <name> [flags]
+  mcpx with server="spec" tool="sc_init" and name="<name>" [arguments]
 
-Flags:
-  --name <name>         Name of the feature (e.g., "user-auth").
-  --description <text>  Brief overview of the feature.
-  --mode <mode>         Set workflow mode: 'step-through' (default) or 'one-shot'.
+Arguments:
+  name="<name>"         Name of the feature (e.g., "user-auth").
+  description="<text>"  Brief overview of the feature.
+  mode="<mode>"         Set workflow mode: 'step-through' (default) or 'one-shot'.
 `;
       } else if (topic === 'plan') {
         output = `
@@ -99,35 +99,34 @@ Progress the workflow to the next state (e.g., Requirements -> Design).
 Scaffolds the next document based on the current state.
 
 Usage:
-  mcpx spec sc_plan [flags]
+  mcpx with server="spec" and tool="sc_plan"
 
-Flags:
-  --feature <name>      Target feature name.
-  --instruction <text>  Add specific guidance or updates for the next phase.
+Arguments:
+  (None - this tool is stateful and automatically targets the active feature)
 `;
       } else if (topic === 'approve') {
         output = `
 Explicitly approve the current drafted phase.
-This is required in 'step-through' mode before calling 'mcpx spec sc_plan' to move to the next phase.
+This is required in 'step-through' mode before calling 'mcpx with server="spec" and tool="sc_plan"' to move to the next phase.
 
 Usage:
-  mcpx spec sc_approve [flags]
+  mcpx with server="spec" and tool="sc_approve"
 
-Flags:
-  --feature <name>      Target feature name.
+Arguments:
+  (None - this tool is stateful and automatically targets the active feature)
 `;
       } else if (topic === 'todo') {
         output = `
 Manage implementation tasks.
 
 Usage:
-  mcpx spec sc_todo_list [flags]
-  mcpx spec sc_todo_start --id <id> [flags]
-  mcpx spec sc_todo_complete --id <id> [flags]
+  mcpx with server="spec" and tool="sc_todo_list" [arguments]
+  mcpx with server="spec" and tool="sc_todo_start" id="<id>" [arguments]
+  mcpx with server="spec" and tool="sc_todo_complete" id="<id>" [arguments]
 
-Flags:
-  --feature <name>      Target feature name.
-  --id <id>             The task ID (e.g., "1.1").
+Arguments:
+  feature="<name>"      Target feature name (optional if already active).
+  id="<id>"             The task ID (e.g., "1.1").
 `;
       } else if (topic === 'epoch') {
         output = `
@@ -135,45 +134,45 @@ Update context for short-term memory.
 Helps agents maintain continuity across sessions.
 
 Usage:
-  mcpx spec sc_epoch [flags]
+  mcpx with server="spec" and tool="sc_epoch" [arguments]
 
-Flags:
-  --feature <name>      Target feature name.
-  --focus <text>        What is being worked on right now.
-  --intentions <text>   What is planned next.
-  --hypotheses <text>   Assumptions about the architecture or solution.
-  --openQuestions <text> Questions pending user feedback.
+Arguments:
+  feature="<name>"      Target feature name.
+  focus="<text>"        What is being worked on right now.
+  intentions="<text>"   What is planned next.
+  hypotheses="<text>"   Assumptions about the architecture or solution.
+  openQuestions="<text>" Questions pending user feedback.
 `;
       } else if (topic === 'archive') {
         output = `
 Manually move the project to the completed directory.
 
 Usage:
-  mcpx spec sc_archive [flags]
+  mcpx with server="spec" and tool="sc_archive" [arguments]
 
-Flags:
-  --feature <name>      Target feature name.
+Arguments:
+  feature="<name>"      Target feature name.
 `;
       } else if (topic === 'mode') {
         output = `
 Toggle project mode between 'one-shot' and 'step-through'.
 
 Usage:
-  mcpx spec sc_mode <mode> [flags]
+  mcpx with server="spec" tool="sc_mode" and mode="<mode>" [arguments]
 
-Flags:
-  --feature <name>      Target feature name.
-  <mode>                'one-shot' or 'step-through'.
+Arguments:
+  feature="<name>"      Target feature name.
+  mode="<mode>"         'one-shot' or 'step-through'.
 `;
       } else if (topic === 'status') {
         output = `
 Get a health check of the active project and discover next steps.
 
 Usage:
-  mcpx spec sc_status [flags]
+  mcpx with server="spec" and tool="sc_status" [arguments]
 
-Flags:
-  --feature <name>      Target feature name.
+Arguments:
+  feature="<name>"      Target feature name.
 `;
       } else if (topic === 'verify') {
         output = `
@@ -181,39 +180,39 @@ Verify current state and check consistency.
 A dedicated tool to validate that the last action worked.
 
 Usage:
-  mcpx spec sc_verify [flags]
+  mcpx with server="spec" and tool="sc_verify" [arguments]
 
-Flags:
-  --feature <name>      Target feature name.
+Arguments:
+  feature="<name>"      Target feature name.
 `;
       } else {
         output = `
 MCP server for managing spec workflow (requirements, design, implementation).
 
 Usage:
-  mcpx spec [command]
+  mcpx with server="spec" and tool="[command]"
 
-Available Commands:
-  mcpx spec sc_status        Get a health check of the active project.
-  mcpx spec sc_verify        Verify current state and check consistency.
-  mcpx spec sc_help          Help about any command.
-  mcpx spec sc_init          Initialize a new feature.
-  mcpx spec sc_plan          Progress the workflow state.
-  mcpx spec sc_approve       Approve the current drafted phase.
-  mcpx spec sc_todo_*        Manage implementation tasks.
-  mcpx spec sc_epoch         Update short-term memory context.
-  mcpx spec sc_archive       Manually archive the project.
-  mcpx spec sc_mode          Toggle between 'one-shot' and 'step-through'.
+Available Tools:
+  mcpx with server="spec" and tool="sc_status"        Get a health check of the active project.
+  mcpx with server="spec" and tool="sc_verify"        Verify current state and check consistency.
+  mcpx with server="spec" and tool="sc_help"          Help about any command.
+  mcpx with server="spec" and tool="sc_init"          Initialize a new feature.
+  mcpx with server="spec" and tool="sc_plan"          Progress the workflow state.
+  mcpx with server="spec" and tool="sc_approve"       Approve the current drafted phase.
+  mcpx with server="spec" and tool="sc_todo_"*        Manage implementation tasks.
+  mcpx with server="spec" and tool="sc_epoch"         Update short-term memory context.
+  mcpx with server="spec" and tool="sc_archive"       Manually archive the project.
+  mcpx with server="spec" and tool="sc_mode"          Toggle between 'one-shot' and 'step-through'.
 
-Flags:
-  --feature <name>         Feature name context.
-  --instruction <text>     Instructions for the next phase.
-  --name <name>            Feature name (for init).
-  --description <text>     Feature description (for init).
-  --id <id>                Task ID (for todo).
-  --mode <mode>            'one-shot' or 'step-through'.
+Arguments:
+  feature="<name>"         Feature name context.
+  instruction="<text>"     Instructions for the next phase.
+  name="<name>"            Feature name (for init).
+  description="<text>"     Feature description (for init).
+  id="<id>"                Task ID (for todo).
+  mode="<mode>"            'one-shot' or 'step-through'.
 
-Use "mcpx spec sc_help [command]" for more information about a command.
+Use mcpx with server="spec" tool="sc_help" and command="[command]" for more information.
 `;
       }
       Logger.logCommand(args.join(' '), [], output);
@@ -311,7 +310,7 @@ Use "mcpx spec sc_help [command]" for more information about a command.
             message = `Please finish editing ${WorkflowStateRepository.getStageFileName('requirements')} (remove all <template> tags) before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.requirements.approved && mode !== 'one-shot') {
-            message = `Requirements drafted but not yet approved. Please review and run \`use mcpx spec sc_approve\` before advancing.`;
+            message = `Requirements drafted but not yet approved. Please review and run \`use mcpx with server="spec" and tool="sc_approve"\` before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.design.exists) {
             if (mode === 'one-shot') {
@@ -333,7 +332,7 @@ Use "mcpx spec sc_help [command]" for more information about a command.
             message = `Please finish editing ${WorkflowStateRepository.getStageFileName('design')} (remove all <template> tags) before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.design.approved && mode !== 'one-shot') {
-            message = `Design drafted but not yet approved. Please review and run \`use mcpx spec sc_approve\` before advancing.`;
+            message = `Design drafted but not yet approved. Please review and run \`use mcpx with server="spec" and tool="sc_approve"\` before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.tasks.exists) {
             if (mode === 'one-shot') {
@@ -355,7 +354,7 @@ Use "mcpx spec sc_help [command]" for more information about a command.
             message = `Please finish editing ${WorkflowStateRepository.getStageFileName('tasks')} (remove all <template> tags) before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else if (!state.tasks.approved && mode !== 'one-shot') {
-            message = `Tasks drafted but not yet approved. Please review and run \`use mcpx spec sc_approve\` before advancing.`;
+            message = `Tasks drafted but not yet approved. Please review and run \`use mcpx with server="spec" and tool="sc_approve"\` before advancing.`;
             if (values.instruction) message += `\n> Reminder instruction: ${values.instruction}`;
         } else {
             // Check if all tasks are complete
@@ -369,7 +368,7 @@ Use "mcpx spec sc_help [command]" for more information about a command.
             }
 
             if (!allTasksComplete) {
-                message = 'Not all implementation tasks are complete. Proceed with `exec todo` or finish tasks manually.';
+                message = 'Not all implementation tasks are complete. Proceed with `mcpx with server="spec" and tool="sc_todo_start"` or finish tasks manually.';
                 if (values.instruction) message += `\n> Received instruction: ${values.instruction}`;
             } else {
                 message = 'Workflow is completely finished.';
