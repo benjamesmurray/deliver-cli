@@ -1,6 +1,6 @@
 {
   "name": "@epoch-ai/deliver-cli",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Streamlined MCP server for managing spec workflow (requirements, design, implementation)",
   "type": "module",
   "main": "dist/index.js",
